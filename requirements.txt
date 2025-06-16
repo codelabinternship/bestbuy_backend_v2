@@ -1,0 +1,10 @@
+﻿Django>=3.2,<5.0
+djangorestframework
+drf-yasg
+python-telegram-bot==22.0
+gunicorn
+psycopg2-binary
+djangorestframework-simplejwt
+Pillow>=10.0
+django-filter==23.1
+django-cors-headers
