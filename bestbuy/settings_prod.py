@@ -26,9 +26,9 @@ SECRET_KEY = 'django-insecure-iza*@a*%!%j9)40j-%@5q=m%e09&u1scq*@(usx%zi0y*f4@2_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["bestbuy-backend-1.onrender.com"]
 
-AUTH_USER_MODEL = 'BestBuy_bot.User'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -57,24 +57,16 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
     "http://localhost:3000",
     "http://localhost:3001",
     "http://localhost:5173",
-    "http://192.168.28.43:5173",
 ]
-CSRF_TRUSTED_ORIGINS = [
+CSRF_TRUSTED_ORIGINS=[
     "http://localhost:3000",
     "http://localhost:3001",
-    "http://192.168.28.43:5173"
-    "http://localhost:5173",
 ]
 
-CORS_ALLOW_METHODS = ['DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT']
-CORS_ALLOW_HEADERS = [
-    'accept', 'accept-encoding', 'authorization', 'content-type',
-    'dnt', 'origin', 'user-agent', 'x-csrftoken', 'x-requested-with',
-]
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -109,11 +101,14 @@ WSGI_APPLICATION = 'models_BestBuy_clients.wsgi.application'
 DATABASES = {
     'default':{
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'bestbuy',
-        'USER': 'postgres',
-        'PASSWORD': '12345',
-        'HOST': 'localhost',
-        'PORT': '5432'
+        'NAME': 'bestbuy_db_p40x',
+        'USER': 'postgres_user',
+        'PASSWORD': 'rS3pLPfpk5s7Lwh0qK32tz4IugtHdNJb',
+        'HOST': 'dpg-d0i8ufemcj7s739r1hgg-a.oregon-postgres.render.com',
+        'PORT': '5432',
+        'OPTIONS': {
+            'sslmode': 'require'
+                      }
     }
 }
 

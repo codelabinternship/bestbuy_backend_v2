@@ -51,4 +51,3 @@ python manage.py migrate
 
 # Start server
 python manage.py runserver
-# bestbuy_backend_v2

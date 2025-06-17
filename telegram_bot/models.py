@@ -3,11 +3,22 @@ from django.db import models
 # Create your models here.
 # models.py
 
+
+
+from django.db import models
+
+
+
+
 class Quiz(models.Model):
     question = models.CharField(max_length=255)
     answer = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    market = models.ForeignKey(
+        'bestbuy_app.Market', 
+        on_delete=models.CASCADE,
+        related_name='quizzes' 
+    )
     def __str__(self):
         return self.question
 
@@ -21,7 +32,7 @@ class TelegramBotConfig(models.Model):
     welcome_video = models.FileField(upload_to='welcome_videos/', null=True, blank=True)
     require_address = models.BooleanField(default=False)
     require_registration = models.BooleanField(default=False)
-    market = models.ForeignKey('BestBuy_bot.Market', on_delete=models.CASCADE)
+    market = models.ForeignKey('bestbuy_app.Market', on_delete=models.CASCADE)
 
     def __str__(self):
         return f"BotConfig for market {self.market.name}"

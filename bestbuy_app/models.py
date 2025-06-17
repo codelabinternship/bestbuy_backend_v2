@@ -233,13 +233,33 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
+
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='bestbuy_user_groups',  # Unique reverse accessor
+        blank=True,
+        help_text='The groups this user belongs to.'
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='bestbuy_user_permissions',  # Unique reverse accessor
+        blank=True,
+        help_text='Specific permissions for this user.'
+    )
+
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['user_name', 'user_id']
+    REQUIRED_FIELDS = ['user_name']  # Removed 'user_id' as it's auto-generated
 
     objects = CustomUserManager()
 
     def __str__(self):
         return self.user_name
+
+
+
+
+
+
 
 class Market(models.Model):
     name = models.CharField(max_length=255)
@@ -248,11 +268,10 @@ class Market(models.Model):
     working_hours_to = models.TimeField(null=True, blank=True)
     is_daily = models.BooleanField(default=True)
     logo = models.ImageField(upload_to='market_logos/', blank=True, null=True)
-    user = models.OneToOneField(User, related_name='market', on_delete=models.CASCADE)
+    user = models.OneToOneField('User', related_name='market', on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.name} ({self.user.user_name})"
-
 
 class AdditionalMarket(models.Model):
     user = models.ForeignKey(User, related_name='additional_markets', on_delete=models.CASCADE)
@@ -370,3 +389,17 @@ class BadPassword(models.Model):
 
     def __str__(self):
         return self.password
+
+
+
+
+#Отдел доставки
+
+class DeliveryDepartment(models.Model):
+    name = models.CharField(max_length=100)
+    address = models.TextField()
+    phone = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name

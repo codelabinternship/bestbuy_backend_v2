@@ -52,7 +52,7 @@ def index_page(request):
 from rest_framework import viewsets
 from .models import AdditionalMarket, Product, Category, User, BotConfiguration, Reviews, OrderItem, RoleChoices, \
     UserActivityLogs, SMSCampaign
-from .serializers import RegisterSerializer, AdditionalMarketSerializer, VariationsSerializer, PaymentMethodsSerializer, \
+from .serializers import DeliveryDepartmentSerializer, RegisterSerializer, AdditionalMarketSerializer, VariationsSerializer, PaymentMethodsSerializer, \
     OrdersSerializer, ExportHistorySerializer, ChannelPostsSerializer, LoyaltyProgramSerializer, BranchesSerializer, \
     ProductSerializer, CategorySerializer, UsersSerializer, BotConfigurationSerializer, ReviewSerializer, \
     OrderItemSerializer, RoleChoicesSerializer, UserActivityLogsSerializer, SMSCampaignSerializer
@@ -257,3 +257,30 @@ class GetMeView(APIView):
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
+
+
+# ViewSet Для отдела доставки
+class DeliveryDepartmentViewSet(viewsets.ModelViewSet):
+    queryset = DeliveryDepartment.objects.all()
+    serializer_class = DeliveryDepartmentSerializer
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(operation_description="Получить список отделов доставки")
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @swagger_auto_schema(operation_description="Создать отдел доставки")
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    @swagger_auto_schema(operation_description="Получить отдел доставки по ID")
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @swagger_auto_schema(operation_description="Обновить отдел доставки")
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @swagger_auto_schema(operation_description="Удалить отдел доставки")
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
