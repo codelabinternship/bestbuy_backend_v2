@@ -109,7 +109,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'myproject_db',
         'USER': 'postgres',
-        'PASSWORD': '12345',
+        'PASSWORD': 'futureNewYorker.310',
         'HOST': 'localhost',
         'PORT': '5432'
     }
@@ -202,3 +202,6 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR/'media'
