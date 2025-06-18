@@ -77,10 +77,16 @@ def register(request):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ProductViewSet(viewsets.ModelViewSet):
-    permission_classes = [AllowAny]
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
+    @swagger_auto_schema(
+        operation_description="Создать продукт с вариациями",
+        responses={201: ProductSerializer()},
+        request_body=ProductSerializer
+    )
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class UserViewSet(viewsets.ModelViewSet):

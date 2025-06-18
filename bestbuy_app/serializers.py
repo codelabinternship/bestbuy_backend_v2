@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.permissions import AllowAny
 
-from .models import DeliveryDepartment, AdditionalMarket, User, Variations, PaymentMethods, Orders, ExportHistory, ChannelPosts, LoyaltyProgram, Branches, Market, Product, Category, BotConfiguration, Reviews, OrderItem, RoleChoices, TransactionTypeChoices, UserActivityLogs, SMSCampaign
+from .models import Variations, DeliveryDepartment, AdditionalMarket, User, Variations, PaymentMethods, Orders, ExportHistory, ChannelPosts, LoyaltyProgram, Branches, Market, Product, Category, BotConfiguration, Reviews, OrderItem, RoleChoices, TransactionTypeChoices, UserActivityLogs, SMSCampaign
 
 
 
@@ -60,11 +60,31 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = '__all__'
 
+class VariationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Variations
+        fields = ['option_name', 'option_value']
+
 
 class ProductSerializer(serializers.ModelSerializer):
+    variations = VariationSerializer(many=True)
+
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = ['name', 'description', 'price', 'discount_price', 'stock_quantity',
+                  'category', 'brand', 'media', 'created_at', 'updated_at', 'variations']
+
+    def create(self, validated_data):
+        from django.db import transaction
+        variations_data = validated_data.pop('variations')
+
+        with transaction.atomic():
+            product = Product.objects.create(**validated_data)
+            for var_data in variations_data:
+                Variations.objects.create(product=product, **var_data)
+
+        return product
+
 
 
 class UsersSerializer(serializers.ModelSerializer):

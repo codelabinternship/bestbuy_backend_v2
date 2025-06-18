@@ -141,16 +141,6 @@ class PaymentMethods(models.Model):
     def __str__(self):
         return f"{self.name} - {'Active' if self.status else 'Inactive'}"
 
-#это вариации например цвет
-class Variations(models.Model):
-    variation_id = models.AutoField(primary_key=True)  # ���������� ID ��������
-    product_id = models.IntegerField()
-    option_name = models.CharField(max_length=255)
-    option_value = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f"{self.option_name}: {self.option_value} (Product {self.product_id})"
-
 
 
 
@@ -351,6 +341,17 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+
+#это вариации например цвет
+class Variations(models.Model):
+    variation_id = models.AutoField(primary_key=True)
+    product = models.ForeignKey(Product, related_name='variations', on_delete=models.CASCADE)
+    option_name = models.CharField(max_length=255)
+    option_value = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.option_name}: {self.option_value} (Product {self.product_id})"
 
 
 
