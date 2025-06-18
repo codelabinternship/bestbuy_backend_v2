@@ -348,7 +348,7 @@ class Product(models.Model):
 #это вариации например цвет
 class Variations(models.Model):
     variation_id = models.AutoField(primary_key=True)
-    product = models.ForeignKey(Product, related_name='variations', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, null=True, on_delete=models.CASCADE, related_name='variations')
     option_name = models.CharField(max_length=255)
     option_value = models.CharField(max_length=255)
 
