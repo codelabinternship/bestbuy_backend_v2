@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib import admin
-from .models import AdditionalMarket, Market, User, Orders, OrderItem, Product, Category, ChannelPosts, LoyaltyProgram, UserActivityLogs, DeliveryMethods, Promocodes, Branches, PaymentMethods, Variations, BotConfiguration, SMSCampaign, Reviews, ExportHistory
+from .models import AdditionalMarket, RoleChoices, Market, User, Orders, OrderItem, Product, Category, ChannelPosts, LoyaltyProgram, UserActivityLogs, DeliveryMethods, Promocodes, Branches, PaymentMethods, Variations, BotConfiguration, SMSCampaign, Reviews, ExportHistory
 
 admin.site.register(User)
 admin.site.register(Orders)

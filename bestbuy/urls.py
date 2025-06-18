@@ -1,5 +1,5 @@
 """
-URL configuration for models_BestBuy_clients project.
+URL configuration for bestbuy project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.2/topics/http/urls/
@@ -24,7 +24,7 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework.routers import DefaultRouter
-from BestBuy_bot.views import GetMeView, AdditionalMarketViewSet, LoginView, MarketViewSet, OrdersViewSet, RegisterView, LoginView, index_page, DashboardView, CategoryViewSet, ProductViewSet, UserViewSet, BotConfigurationViewSet, ReviewViewSet, OrderItemViewSet, RoleChoicesView, UserActivityLogsViewSet, SMSCampaignViewSet, BranchesViewSet, PaymentMethodsViewSet, VariationsViewSet
+from bestbuy_app.views import DeliveryDepartmentViewSet, AdditionalMarketViewSet, GetMeView, LoginView, MarketViewSet, OrdersViewSet, RegisterView, LoginView, index_page, DashboardView, CategoryViewSet, ProductViewSet, UserViewSet, BotConfigurationViewSet, ReviewViewSet, OrderItemViewSet, RoleChoicesView, UserActivityLogsViewSet, SMSCampaignViewSet, BranchesViewSet, PaymentMethodsViewSet, VariationsViewSet
 router = DefaultRouter()
 
 schema_view = get_schema_view(
@@ -54,7 +54,8 @@ router.register(r'payment-methods', PaymentMethodsViewSet)
 router.register(r'variations', VariationsViewSet)
 router.register(r'orders', OrdersViewSet)
 router.register(r'markets', MarketViewSet)
-router.register(r'additional_markets', AdditionalMarketViewSet)
+router.register(r'additional_markets', AdditionalMarketViewSet),
+router.register(r'delivery-departments', DeliveryDepartmentViewSet)
 # from rest_framework_simplejwt.views import (
 #     TokenObtainPairView,
 #     TokenRefreshView,
@@ -68,20 +69,19 @@ urlpatterns = [
     # Аутентификация
     path('api/auth/register/', RegisterView.as_view(), name='auth_register'),
     path('api/auth/login/', LoginView.as_view(), name='auth_login'),
-    path('api/', include('BestBuy_bot.urls')),
 
-
-
-
+    #Функция GetMe
     path('users/me/', GetMeView.as_view(), name='get-me'),
 
+  
+    
 
     # Страница ролей
     path('api/roles/', RoleChoicesView.as_view(), name='roles'),
 
     # Прочие API endpoint'ы
     path('api/dashboard/', DashboardView.as_view(), name='dashboard'),
-    path('api/', include(router.urls)),
+    #path('api/', include(router.urls)),
 
     # Swagger и Redoc
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
@@ -90,6 +90,8 @@ urlpatterns = [
 
     # Django admin
     path('admin/', admin.site.urls),
+    #path('api/', include('bestbuy_app.urls')),
+    path('bot/', include('telegram_bot.urls')),
 
     # Главная страница
     path('', index_page),

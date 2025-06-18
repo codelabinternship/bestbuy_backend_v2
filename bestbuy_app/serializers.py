@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.permissions import AllowAny
 
-from .models import AdditionalMarket, User, Variations, PaymentMethods, Orders, ExportHistory, ChannelPosts, LoyaltyProgram, Branches, Market, Product, Category, BotConfiguration, Reviews, OrderItem, RoleChoices, TransactionTypeChoices, UserActivityLogs, SMSCampaign
+from .models import DeliveryDepartment, AdditionalMarket, User, Variations, PaymentMethods, Orders, ExportHistory, ChannelPosts, LoyaltyProgram, Branches, Market, Product, Category, BotConfiguration, Reviews, OrderItem, RoleChoices, TransactionTypeChoices, UserActivityLogs, SMSCampaign
 
 
 
@@ -148,4 +148,13 @@ class PaymentMethodsSerializer(serializers.ModelSerializer):
 class VariationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Variations
+        fields = '__all__'
+
+
+
+
+#Сериализатор для отдела доставки
+class DeliveryDepartmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DeliveryDepartment
         fields = '__all__'
