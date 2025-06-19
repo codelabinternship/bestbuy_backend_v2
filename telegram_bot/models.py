@@ -7,7 +7,7 @@ from django.db import models
 
 from django.db import models
 
-
+from bestbuy_app.models import Market
 
 
 class Quiz(models.Model):
@@ -22,17 +22,41 @@ class Quiz(models.Model):
     def __str__(self):
         return self.question
 
-class TelegramBotConfig(models.Model):
-    contacts = models.JSONField()
-    about_company = models.TextField()
-    about_delivery = models.TextField()
-    announcement = models.TextField()
-    web_app_url = models.URLField()
-    welcome_message = models.TextField()
-    welcome_video = models.FileField(upload_to='welcome_videos/', null=True, blank=True)
-    require_address = models.BooleanField(default=False)
-    require_registration = models.BooleanField(default=False)
-    market = models.ForeignKey('bestbuy_app.Market', on_delete=models.CASCADE)
+class Bot(models.Model):
+    bot_token = models.CharField(max_length=255, unique=True)
+    bot_name = models.CharField(max_length=255)
+    market = models.ForeignKey(Market, on_delete=models.CASCADE)
+    status = models.BooleanField(default=False)  # False until successfully initialized
+    settings = models.JSONField(default=dict)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+    class Meta:
+        verbose_name = "Telegram Bot"
+        verbose_name_plural = "Telegram Bots"
 
     def __str__(self):
-        return f"BotConfig for market {self.market.name}"
+            return f"{self.bot_name} ({self.market.name})"
+
+    def start_bot(self):
+        from telegram import Bot as TgBot, InlineKeyboardButton, InlineKeyboardMarkup
+        from telegram.error import TelegramError
+
+        try:
+            tg_bot = TgBot(token=self.bot_token)
+            keyboard = [
+                [InlineKeyboardButton(text=self.market.name, web_app={"url": self.market.web_app_url})]
+            ]
+            markup = InlineKeyboardMarkup(keyboard)
+            tg_bot.send_message(
+                chat_id="@your_channel_or_group",
+                text=f"*{self.bot_name} is ready!*",
+                reply_markup=markup,
+                parse_mode="Markdown"
+            )
+            self.status = True
+            self.save()
+            return True
+        except TelegramError as e:
+            print(f"Failed to start bot {self.bot_name}: {e}")
+            return False

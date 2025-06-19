@@ -1,4 +1,4 @@
-#Файл settings.py для локального тестирования
+#пїЅпїЅпїЅпїЅ settings.py пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 """
 Django settings for bestbuy project.
 
@@ -16,6 +16,8 @@ from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+AUTH_USER_MODEL = 'bestbuy_app.User'
 
 
 # Quick-start development settings - unsuitable for production
@@ -43,7 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'corsheaders',
-    'telegram_bot'
+    'telegram_bot',
 ]
 #AUTH_USER_MODEL = 'bestbuy.User'
 
@@ -107,9 +109,9 @@ WSGI_APPLICATION = 'bestbuy.wsgi.application'
 DATABASES = {
     'default':{
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'myproject_db',
+        'NAME': 'bestbuy',
         'USER': 'postgres',
-        'PASSWORD': '12345',
+        'PASSWORD': 'futureNewYorker.310',
         'HOST': 'localhost',
         'PORT': '5432'
     }
