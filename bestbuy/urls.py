@@ -27,6 +27,27 @@ from rest_framework.routers import DefaultRouter
 from bestbuy_app.views import DeliveryDepartmentViewSet, AdditionalMarketViewSet, GetMeView, LoginView, MarketViewSet, OrdersViewSet, RegisterView, LoginView, index_page, DashboardView, CategoryViewSet, ProductViewSet, UserViewSet, BotConfigurationViewSet, ReviewViewSet, OrderItemViewSet, RoleChoicesView, UserActivityLogsViewSet, SMSCampaignViewSet, BranchesViewSet, PaymentMethodsViewSet, VariationsViewSet
 router = DefaultRouter()
 
+
+
+# Импорт ViewSet
+from bestbuy_app.views import (
+    CategoryViewSet, ProductViewSet, UserViewSet, BotConfigurationViewSet,
+    ReviewViewSet, OrderItemViewSet, UserActivityLogsViewSet,
+    SMSCampaignViewSet, BranchesViewSet, PaymentMethodsViewSet,
+    VariationsViewSet, OrdersViewSet, MarketViewSet,
+    AdditionalMarketViewSet, DeliveryDepartmentViewSet,
+    RegisterView, LoginView, GetMeView, RoleChoicesView, DashboardView,
+    TelegramAuthView
+)
+
+
+
+
+
+
+
+
+
 schema_view = get_schema_view(
     openapi.Info(
         title="BestBuy Backend API",
@@ -56,6 +77,8 @@ router.register(r'orders', OrdersViewSet)
 router.register(r'markets', MarketViewSet)
 router.register(r'additional_markets', AdditionalMarketViewSet),
 router.register(r'delivery-departments', DeliveryDepartmentViewSet)
+#router.register(r'telegram_auth', TelegramAuthView)
+
 # from rest_framework_simplejwt.views import (
 #     TokenObtainPairView,
 #     TokenRefreshView,
@@ -69,19 +92,19 @@ urlpatterns = [
     # Аутентификация
     path('api/auth/register/', RegisterView.as_view(), name='auth_register'),
     path('api/auth/login/', LoginView.as_view(), name='auth_login'),
+    path('api/auth/telegram-auth/', TelegramAuthView.as_view(), name='telegram-auth'),
 
     #Функция GetMe
-    path('users/me/', GetMeView.as_view(), name='get-me'),
+    path('api/users/me/', GetMeView.as_view(), name='get-me'),
 
-  
-    
 
     # Страница ролей
     path('api/roles/', RoleChoicesView.as_view(), name='roles'),
 
     # Прочие API endpoint'ы
+    path('api/roles/', RoleChoicesView.as_view(), name='roles'),
     path('api/dashboard/', DashboardView.as_view(), name='dashboard'),
-    #path('api/', include(router.urls)),
+    path('api/', include(router.urls)),
 
     # Swagger и Redoc
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
@@ -90,13 +113,13 @@ urlpatterns = [
 
     # Django admin
     path('admin/', admin.site.urls),
-    #path('api/', include('bestbuy_app.urls')),
+    #path('api/', include('router.urls')),
     path('bot/', include('telegram_bot.urls')),
 
     # Главная страница
     path('', index_page),
     path('', include(router.urls)),
-]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
