@@ -290,3 +290,44 @@ class DeliveryDepartmentViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(operation_description="Удалить отдел доставки")
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
+
+
+
+class TelegramAuthView(APIView):
+    @swagger_auto_schema(
+        operation_description="Authenticate via Telegram ID",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['telegram_id'],
+            properties={
+                'telegram_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                'username': openapi.Schema(type=openapi.TYPE_STRING),
+                'first_name': openapi.Schema(type=openapi.TYPE_STRING),
+            },
+        ),
+        responses={200: openapi.Response('User Authenticated', UserSerializer)}
+    )
+    def post(self, request):
+        telegram_id = request.data.get("telegram_id")
+        username = request.data.get("username", f"user_{telegram_id}")
+        first_name = request.data.get("first_name", "")
+        is_new = False
+
+        if not telegram_id:
+            return Response({"error": "telegram_id is required"}, status=400)
+
+        user, created = User.objects.get_or_create(
+            telegram_id=telegram_id,
+            defaults={
+                "username": username or f"user_{telegram_id}",
+                "first_name": first_name,
+                "email": f"tg_{telegram_id}@telegram.local",
+                "role": User.RoleChoices.EMPLOYER,
+            }
+        )
+
+        is_new = created
+        return Response({
+            "user": UserSerializer(user).data,
+            "is_new": is_new
+        }, status=200)
