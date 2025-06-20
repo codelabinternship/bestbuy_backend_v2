@@ -20,39 +20,6 @@ class BotViewSet(viewsets.ModelViewSet):
     serializer_class = BotSerializer
 
 class BotRegistrationView(APIView):
-    @swagger_auto_schema(
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                'bot_token': openapi.Schema(type=openapi.TYPE_STRING, description='The token for the bot'),
-                'bot_name': openapi.Schema(type=openapi.TYPE_STRING, description='The name of the bot'),
-                'market_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='The ID of the market'),
-            },
-            required=['bot_token', 'bot_name', 'market_id']
-        ),
-        responses={
-            201: openapi.Response('Bot created', openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-                properties={
-                    'bot_token': openapi.Schema(type=openapi.TYPE_STRING),
-                    'bot_name': openapi.Schema(type=openapi.TYPE_STRING),
-                    'market_id': openapi.Schema(type=openapi.TYPE_INTEGER),
-                }
-            )),
-            400: openapi.Response('Bad Request', openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-                properties={
-                    'error': openapi.Schema(type=openapi.TYPE_STRING),
-                }
-            )),
-            500: openapi.Response('Internal Server Error', openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-                properties={
-                    'error': openapi.Schema(type=openapi.TYPE_STRING),
-                }
-            )),
-        }
-    )
     def post(self, request):
         bot_token = request.data.get('bot_token')
         bot_name = request.data.get('bot_name')

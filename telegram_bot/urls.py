@@ -7,5 +7,4 @@ router.register(r'bots', BotViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('register/', BotRegistrationView.as_view(), name='bot-register')
 ]

@@ -326,4 +326,5 @@ class TelegramAuthView(APIView):
         return Response({
             "user": UserSerializer(user).data,
             "is_new": is_new
+        })
 
