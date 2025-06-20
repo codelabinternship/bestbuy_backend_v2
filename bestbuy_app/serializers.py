@@ -10,7 +10,7 @@ from .models import Variations, DeliveryDepartment, AdditionalMarket, User, Vari
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'user_name', 'email', 'created_at', 'role', 'address', 'status']
+        fields = ['telegram_id', 'id', 'user_name', 'email', 'created_at', 'role', 'address', 'status']
 
 
 class RegisterSerializer(serializers.ModelSerializer):

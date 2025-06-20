@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import MarketViewSet, DeliveryDepartmentViewSet, LoyaltyProgramViewSet, ChannelPostsViewSet, ExportHistoryViewSet, OrdersViewSet, VariationsViewSet, PaymentMethodsViewSet, BranchesViewSet, ProductViewSet, CategoryViewSet, UserViewSet, BotConfigurationViewSet, ReviewViewSet, OrderItemViewSet, RoleChoicesView, UserActivityLogsViewSet, SMSCampaignViewSet
+from .views import TelegramAuthView, MarketViewSet, DeliveryDepartmentViewSet, LoyaltyProgramViewSet, ChannelPostsViewSet, ExportHistoryViewSet, OrdersViewSet, VariationsViewSet, PaymentMethodsViewSet, BranchesViewSet, ProductViewSet, CategoryViewSet, UserViewSet, BotConfigurationViewSet, ReviewViewSet, OrderItemViewSet, RoleChoicesView, UserActivityLogsViewSet, SMSCampaignViewSet
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -25,5 +25,6 @@ router.register(r'delivery-departments', DeliveryDepartmentViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),
-    path('api/auth/me/', GetMeView.as_view(), name='get_me')
+    #path('api/auth/me/', GetMeView.as_view(), name='get_me'),
+    path('api/telegram-auth/', TelegramAuthView.as_view(), name='telegram-auth')
 ]
