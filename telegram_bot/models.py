@@ -1,32 +1,12 @@
 from django.db import models
-
-# Create your models here.
-# models.py
-
-
-
-from django.db import models
-
 from bestbuy_app.models import Market
 
-
-class Quiz(models.Model):
-    question = models.CharField(max_length=255)
-    answer = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-    market = models.ForeignKey(
-        'bestbuy_app.Market', 
-        on_delete=models.CASCADE,
-        related_name='quizzes' 
-    )
-    def __str__(self):
-        return self.question
 
 class Bot(models.Model):
     bot_token = models.CharField(max_length=255, unique=True)
     bot_name = models.CharField(max_length=255)
     market = models.ForeignKey(Market, on_delete=models.CASCADE)
-    status = models.BooleanField(default=False)  # False until successfully initialized
+    status = models.BooleanField(default=False)
     settings = models.JSONField(default=dict)
     created_at = models.DateTimeField(auto_now_add=True)
 

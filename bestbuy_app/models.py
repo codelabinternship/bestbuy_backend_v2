@@ -144,21 +144,6 @@ class PaymentMethods(models.Model):
 
 
 
-
-class BotConfiguration(models.Model):
-    bot_id = models.AutoField(primary_key=True)  # ���������� ID ����
-    bot_token = models.CharField(max_length=255)
-    bot_name = models.CharField(max_length=255)
-    settings = models.JSONField()  # ������ ��������� � ������� JSON
-    status = models.BooleanField(default=True)
-
-    def __str__(self):
-        return f"{self.bot_name} - {'Active' if self.status else 'Inactive'}"
-
-
-
-
-
 # class SMSCampaigns(models.Model):
 #     campaign_id = models.AutoField(primary_key=True)  # ���������� ID ��������
 #     name = models.CharField(max_length=255)

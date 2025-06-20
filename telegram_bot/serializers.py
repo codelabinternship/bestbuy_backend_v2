@@ -1,13 +1,9 @@
 from rest_framework import serializers
 
 from bestbuy_app.models import Market
-from .models import Quiz, Bot
+from .models import Bot
 
 
-class QuizSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Quiz
-        fields = '__all__'
 
 
 class BotSerializer(serializers.ModelSerializer):

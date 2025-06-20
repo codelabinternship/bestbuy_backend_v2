@@ -50,11 +50,11 @@ def index_page(request):
 
 
 from rest_framework import viewsets
-from .models import AdditionalMarket, Product, Category, User, BotConfiguration, Reviews, OrderItem, RoleChoices, \
+from .models import AdditionalMarket, Product, Category, User, Reviews, OrderItem, RoleChoices, \
     UserActivityLogs, SMSCampaign
 from .serializers import DeliveryDepartmentSerializer, RegisterSerializer, AdditionalMarketSerializer, VariationsSerializer, PaymentMethodsSerializer, \
     OrdersSerializer, ExportHistorySerializer, ChannelPostsSerializer, LoyaltyProgramSerializer, BranchesSerializer, \
-    ProductSerializer, CategorySerializer, UsersSerializer, BotConfigurationSerializer, ReviewSerializer, \
+    ProductSerializer, CategorySerializer, UsersSerializer, ReviewSerializer, \
     OrderItemSerializer, RoleChoicesSerializer, UserActivityLogsSerializer, SMSCampaignSerializer
 from rest_framework.views import APIView
 from rest_framework import status
@@ -94,10 +94,6 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UsersSerializer
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class BotConfigurationViewSet(viewsets.ModelViewSet):
-    queryset = BotConfiguration.objects.all()
-    serializer_class = BotConfigurationSerializer
 
 
 @method_decorator(csrf_exempt, name='dispatch')

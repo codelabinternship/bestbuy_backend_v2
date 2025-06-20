@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.permissions import AllowAny
 
-from .models import Variations, DeliveryDepartment, AdditionalMarket, User, Variations, PaymentMethods, Orders, ExportHistory, ChannelPosts, LoyaltyProgram, Branches, Market, Product, Category, BotConfiguration, Reviews, OrderItem, RoleChoices, TransactionTypeChoices, UserActivityLogs, SMSCampaign
+from .models import Variations, DeliveryDepartment, AdditionalMarket, User, Variations, PaymentMethods, Orders, ExportHistory, ChannelPosts, LoyaltyProgram, Branches, Market, Product, Category, Reviews, OrderItem, RoleChoices, TransactionTypeChoices, UserActivityLogs, SMSCampaign
 
 
 
@@ -92,11 +92,6 @@ class UsersSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__'
 
-
-class BotConfigurationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BotConfiguration
-        fields = '__all__'
 
 
 class ReviewSerializer(serializers.ModelSerializer):
