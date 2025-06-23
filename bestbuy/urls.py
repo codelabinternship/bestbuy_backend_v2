@@ -62,21 +62,21 @@ schema_view = get_schema_view(
 
 
 router = DefaultRouter()
-router.register(r'categories', CategoryViewSet)
+router.register(r'categories', CategoryViewSet, basename='categories')
 router.register(r'products', ProductViewSet, basename='product')
-router.register(r'users', UserViewSet)
-router.register(r'bot-configs', BotConfigurationViewSet)
-router.register(r'reviews', ReviewViewSet)
-router.register(r'order-items', OrderItemViewSet)
-router.register(r'user-logs', UserActivityLogsViewSet)
-router.register(r'sms-campaigns', SMSCampaignViewSet)
-router.register(r'branches', BranchesViewSet)
-router.register(r'payment-methods', PaymentMethodsViewSet)
-router.register(r'variations', VariationsViewSet)
-router.register(r'orders', OrdersViewSet)
-router.register(r'markets', MarketViewSet)
-router.register(r'additional_markets', AdditionalMarketViewSet),
-router.register(r'delivery-departments', DeliveryDepartmentViewSet)
+router.register(r'users', UserViewSet, basename='users')
+router.register(r'bot-configs', BotConfigurationViewSet, basename='bot-configs')
+router.register(r'reviews', ReviewViewSet, basename='reviews')
+router.register(r'order-items', OrderItemViewSet, basename='order-items')
+router.register(r'user-logs', UserActivityLogsViewSet, basename='user-logs')
+router.register(r'sms-campaigns', SMSCampaignViewSet, basename='sms-campaigns')
+router.register(r'branches', BranchesViewSet, basename='branches')
+router.register(r'payment-methods', PaymentMethodsViewSet, basename='payment-methods')
+router.register(r'variations', VariationsViewSet, basename='variations')
+router.register(r'orders', OrdersViewSet, basename='orders')
+router.register(r'markets', MarketViewSet, basename='markets')
+router.register(r'additional_markets', AdditionalMarketViewSet, basename='additional_markets'),
+router.register(r'delivery-departments', DeliveryDepartmentViewSet, basename='delivery-departments')
 #router.register(r'telegram_auth', TelegramAuthView)
 
 # from rest_framework_simplejwt.views import (
@@ -104,7 +104,7 @@ urlpatterns = [
     # Прочие API endpoint'ы
     path('api/roles/', RoleChoicesView.as_view(), name='roles'),
     path('api/dashboard/', DashboardView.as_view(), name='dashboard'),
-    path('api/', include(router.urls)),
+    #path('api/', include(router.urls)),
 
     # Swagger и Redoc
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),

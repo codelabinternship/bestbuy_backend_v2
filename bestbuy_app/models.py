@@ -260,6 +260,7 @@ class Market(models.Model):
     is_daily = models.BooleanField(default=True)
     logo = models.ImageField(upload_to='market_logos/', blank=True, null=True)
     user = models.OneToOneField('User', related_name='market', on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='markets_owned', null=True)
 
     def __str__(self):
         return f"{self.name} ({self.user.user_name})"

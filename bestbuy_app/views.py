@@ -18,6 +18,40 @@ from rest_framework import filters
 from drf_yasg import openapi
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from drf_yasg.inspectors import SwaggerAutoSchema
+
+
+
+class TaggedSchema(SwaggerAutoSchema):
+    TAG = "Default"
+
+    def get_tags(self, operation_keys=None):
+        return [self.TAG]
+
+class ProductSchema(TaggedSchema):
+    TAG = "Products_api"
+
+class UserSchema(TaggedSchema):
+    TAG = "Users_api"
+
+class MarketSchema(TaggedSchema):
+    TAG = "Markets_api"
+
+class OrderSchema(TaggedSchema):
+    TAG = "Orders_api"
+
+class DashboardSchema(TaggedSchema):
+    TAG = "Dashboard_api"
+
+class TelegramSchema(TaggedSchema):
+    TAG = "Telegram_api"
+
+
+class Additional_markets(TaggedSchema):
+    TAG = "Additional_markets_api"
+
+class RegisterAuth(TaggedSchema):
+    TAG = "RegisterAuth_api"
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -25,6 +59,7 @@ class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     # permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
+    swagger_schema = RegisterAuth
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -32,7 +67,7 @@ class DashboardView(APIView):
 
     @swagger_auto_schema(operation_description="Get user dashboard data", manual_parameters=[
         openapi.Parameter('page', openapi.IN_QUERY, description="Page number", type=openapi.TYPE_INTEGER),
-    ])
+    ], tags=["Dashboard"])
     def get(self, request):
         user = request.user
         user_serializer = UserSerializer(user)
@@ -79,19 +114,23 @@ def register(request):
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    swagger_schema = ProductSchema
 
     @swagger_auto_schema(
         operation_description="Создать продукт с вариациями",
         responses={201: ProductSerializer()},
-        request_body=ProductSerializer
+        request_body=ProductSerializer,
+        tags=["Products_api"]
     )
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UsersSerializer
+    swagger_schema = UserSchema
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -114,7 +153,7 @@ class OrderItemViewSet(viewsets.ModelViewSet):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class RoleChoicesView(APIView):
-    @swagger_auto_schema(rquery_serializer=RoleChoicesSerializer)
+    @swagger_auto_schema(rquery_serializer=RoleChoicesSerializer, tags=["RolechoiChoise"])
     def get(self, request):
         roles = [{"key": role.name, "value": role.value} for role in RoleChoices]
         return Response(roles, status=status.HTTP_200_OK)
@@ -146,9 +185,9 @@ class VariationsViewSet(viewsets.ModelViewSet):
     serializer_class = VariationsSerializer
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+#class UserViewSet(viewsets.ModelViewSet):
+    #queryset = User.objects.all()
+    #serializer_class = UserSerializer
 
 
 class OrdersViewSet(viewsets.ModelViewSet):
@@ -175,7 +214,7 @@ class LoyaltyProgramViewSet(viewsets.ModelViewSet):
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
-    @swagger_auto_schema(request_body=RegisterSerializer)
+    @swagger_auto_schema(request_body=RegisterSerializer, tags=["Register_api"])
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
@@ -189,12 +228,13 @@ class MarketViewSet(viewsets.ModelViewSet):
     queryset = Market.objects.all()
     serializer_class = MarketSerializer
     permission_classes = [AllowAny]
+    swagger_schema = MarketSchema
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+    #def perform_create(self, serializer):
+        #serializer.save(owner=self.request.user)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -205,11 +245,15 @@ class MarketViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    #def perform_create(self, serializer):
+        #serializer.save(owner=self.request.user)
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class AdditionalMarketViewSet(viewsets.ModelViewSet):
     queryset = AdditionalMarket.objects.all()
     serializer_class = AdditionalMarketSerializer
+    swagger_schema = Additional_markets
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['name', 'user']
@@ -228,7 +272,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
-    @swagger_auto_schema(request_body=LoginSerializer)
+    @swagger_auto_schema(request_body=LoginSerializer, tags=["LoginView_api"])
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -258,7 +302,7 @@ class GetMeView(APIView):
 
     @swagger_auto_schema(
         operation_description="Получить информацию о текущем пользователе",
-        responses={200: UserSerializer()}
+        responses={200: UserSerializer()}, tags=["GetMe_api"]
     )
     def get(self, request):
         serializer = UserSerializer(request.user)
@@ -301,16 +345,17 @@ class TelegramAuthView(APIView):
             required=['telegram_id'],
             properties={
                 'telegram_id': openapi.Schema(type=openapi.TYPE_INTEGER),
-                'username': openapi.Schema(type=openapi.TYPE_STRING),
-                'first_name': openapi.Schema(type=openapi.TYPE_STRING),
+                'user_name': openapi.Schema(type=openapi.TYPE_STRING),
+
+
             },
         ),
-        responses={200: openapi.Response('User Authenticated', UserSerializer)}
+        responses={200: openapi.Response('User Authenticated', UserSerializer)}, tags=["TelegramAuth_api"]
     )
     def post(self, request):
         telegram_id = request.data.get("telegram_id")
-        username = request.data.get("username", f"user_{telegram_id}")
-        first_name = request.data.get("first_name", "")
+        user_name = request.data.get("user_name", f"user_{telegram_id}")
+        #first_name = request.data.get("first_name", "")
         is_new = False
 
         if not telegram_id:
@@ -319,10 +364,9 @@ class TelegramAuthView(APIView):
         user, created = User.objects.get_or_create(
             telegram_id=telegram_id,
             defaults={
-                "username": username or f"user_{telegram_id}",
-                "first_name": first_name,
+                "user_name": user_name or f"user_{telegram_id}",
                 "email": f"tg_{telegram_id}@telegram.local",
-                "role": User.RoleChoices.EMPLOYER,
+                "role": RoleChoices.CUSTOMER,
             }
         )
 
