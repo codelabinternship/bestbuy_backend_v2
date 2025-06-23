@@ -24,7 +24,8 @@ router.register(r'markets', MarketViewSet, basename='market')
 router.register(r'delivery-departments', DeliveryDepartmentViewSet)
 
 urlpatterns = [
-    path('api/', include(router.urls)),
+    path('', include(router.urls)),
     #path('api/auth/me/', GetMeView.as_view(), name='get_me'),
-    path('api/telegram-auth/', TelegramAuthView.as_view(), name='telegram-auth')
+    path('auth/telegram-auth/', TelegramAuthView.as_view(), name='telegram-auth'),
+
 ]
