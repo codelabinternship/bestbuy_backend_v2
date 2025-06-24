@@ -1,11 +1,10 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import BotViewSet, BotRegistrationView
+from .views import BotViewSet
 
 router = DefaultRouter()
-router.register(r'bots', BotViewSet)
+router.register(r'bot', BotViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('register/', BotRegistrationView.as_view(), name='bot-register')
+    path('api/', include(router.urls)),
 ]

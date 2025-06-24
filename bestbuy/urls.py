@@ -26,6 +26,7 @@ from drf_yasg import openapi
 from rest_framework.routers import DefaultRouter
 from bestbuy_app.views import DeliveryDepartmentViewSet, AdditionalMarketViewSet, GetMeView, LoginView, MarketViewSet, OrdersViewSet, RegisterView, LoginView, index_page, DashboardView, CategoryViewSet, ProductViewSet, UserViewSet, ReviewViewSet, OrderItemViewSet, RoleChoicesView, UserActivityLogsViewSet, SMSCampaignViewSet, BranchesViewSet, PaymentMethodsViewSet, VariationsViewSet
 router = DefaultRouter()
+from telegram_bot.views import BotViewSet
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -55,6 +56,7 @@ router.register(r'orders', OrdersViewSet)
 router.register(r'markets', MarketViewSet)
 router.register(r'additional_markets', AdditionalMarketViewSet),
 router.register(r'delivery-departments', DeliveryDepartmentViewSet)
+router.register(r'bot', BotViewSet)
 # from rest_framework_simplejwt.views import (
 #     TokenObtainPairView,
 #     TokenRefreshView,
