@@ -3,8 +3,8 @@ from rest_framework.routers import DefaultRouter
 from .views import BotViewSet
 
 router = DefaultRouter()
-router.register(r'bot', BotViewSet)
+router.register(r'', BotViewSet)
 
 urlpatterns = [
-    path('api/', include(router.urls)),
+    path('', include(router.urls)),
 ]

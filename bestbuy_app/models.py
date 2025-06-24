@@ -192,6 +192,7 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    telegram_id = models.BigIntegerField(null=True, blank=True, unique=True)
     user_name = models.CharField(max_length=250)
     id = models.AutoField(primary_key=True)
     email = models.EmailField(max_length=200, unique=True)
