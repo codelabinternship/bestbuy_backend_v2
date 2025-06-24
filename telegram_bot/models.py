@@ -9,6 +9,7 @@ class Bot(models.Model):
     status = models.BooleanField(default=False)
     settings = models.JSONField(default=dict)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=False)
 
 
     class Meta:
