@@ -31,8 +31,8 @@ INSTALLED_APPS = [
     'drf_yasg',
     'bestbuy_app',
     'telegram_bot',
-    'corsheaders',
-    'whitenoise.runserver_nostatic',
+    #'corsheaders',
+    #'whitenoise.runserver_nostatic',
     'storages',
 ]
 
