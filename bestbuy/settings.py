@@ -115,7 +115,7 @@ else:
             'NAME': 'bestbuy_db_ly3w',
             'USER': 'postgres_user',
             'PASSWORD': 'yTOGzwe9O6W4AkuDNYhRIVcCmRofHMsT',
-            'HOST': 'dpg-d1d6o8be5dus73b25jf0-',
+            'HOST': 'dpg-d1d6o8be5dus73b25jf0-a',
             'PORT': '5432',
         }
     }
