@@ -32,7 +32,7 @@ INSTALLED_APPS = [
     'bestbuy_app',
     'telegram_bot',
     #'corsheaders',
-    #'whitenoise.runserver_nostatic',
+    'whitenoise.runserver_nostatic',
     #'storages',
 ]
 
