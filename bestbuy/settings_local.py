@@ -1,4 +1,4 @@
-#Файл settings.py для локального тестирования
+#Файл settings_local.py для локального тестирования
 """
 Django settings for bestbuy project.
 

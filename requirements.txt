@@ -8,3 +8,5 @@ djangorestframework-simplejwt
 Pillow>=10.0
 django-filter==23.1
 django-cors-headers
+dj_database_url
+dotenv

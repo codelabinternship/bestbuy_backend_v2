@@ -104,7 +104,7 @@ urlpatterns = [
     # Прочие API endpoint'ы
     path('api/roles/', RoleChoicesView.as_view(), name='roles'),
     path('api/dashboard/', DashboardView.as_view(), name='dashboard'),
-    #path('api/', include(router.urls)),
+    path('api/', include(router.urls)),
 
     # Swagger и Redoc
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
