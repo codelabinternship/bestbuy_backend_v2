@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     'telegram_bot',
     #'corsheaders',
     #'whitenoise.runserver_nostatic',
-    'storages',
+    #'storages',
 ]
 
 # Middleware
