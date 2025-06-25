@@ -11,3 +11,4 @@ django-cors-headers
 dj_database_url
 dotenv
 whitenoise==6.6.0
+django-storages
