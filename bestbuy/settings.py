@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_yasg',
-    'zein_app',
+    'bestbuy_app',
     'telegram_bot',
     'corsheaders',
     'whitenoise.runserver_nostatic',
