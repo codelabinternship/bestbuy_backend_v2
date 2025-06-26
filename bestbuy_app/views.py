@@ -19,6 +19,7 @@ from drf_yasg import openapi
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from drf_yasg.inspectors import SwaggerAutoSchema
+from rest_framework.parsers import JSONParser, FormParser, MultiPartParser
 
 
 
@@ -220,7 +221,7 @@ class PaymentMethodsViewSet(viewsets.ModelViewSet):
 class VariationsViewSet(viewsets.ModelViewSet):
     queryset = Variations.objects.all()
     serializer_class = VariationsSerializer
-    swagger_schema = variations_api
+    parser_class = (MultiPartParser, FormParser)
 
 
 #class UserViewSet(viewsets.ModelViewSet):
