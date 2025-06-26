@@ -183,6 +183,7 @@ class PaymentMethodsViewSet(viewsets.ModelViewSet):
 class VariationsViewSet(viewsets.ModelViewSet):
     queryset = Variations.objects.all()
     serializer_class = VariationsSerializer
+    parser_class = (MultiPartParser, FromParser)
 
 
 #class UserViewSet(viewsets.ModelViewSet):
