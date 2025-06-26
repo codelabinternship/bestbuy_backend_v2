@@ -118,7 +118,7 @@ urlpatterns = [
 
     # Главная страница
     path('', index_page),
-    path('', include(router.urls)),
+    #path('', include(router.urls)),
 ]
 
 if settings.DEBUG:
