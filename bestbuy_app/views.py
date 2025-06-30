@@ -141,30 +141,38 @@ def register(request):
     return render(request, 'registration/register.html', {'form': form})
 
 
-@method_decorator(csrf_exempt, name='dispatch')
+
+
+from rest_framework.parsers import JSONParser
+
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    swagger_schema = ProductSchema
     parser_classes = [MultiPartParser, FormParser]
+    swagger_schema = ProductSchema
 
-    @swagger_auto_schema(
-        operation_description="Создать продукт с вариациями",
-        request_body=ProductSerializer,
-        responses={201: ProductSerializer},
-        tags=["Products_api"]
-    )
-    def create(self, request, *args, **kwargs):
-        if isinstance(request.data.get('variations'), str):
+    def perform_create(self, serializer):
+        variations_data = self.request.data.get('variations')
+        if isinstance(variations_data, str):
             try:
-                request.data['variations'] = json.loads(request.data['variations'])
+                variations_data = json.loads(variations_data)
             except json.JSONDecodeError:
-                return Response({'error': 'Invalid JSON format in variations'}, status=400)
+                raise serializers.ValidationError({'variations': 'Invalid JSON format'})
+
+        product = serializer.save()
+        for var in variations_data:
+            Variations.objects.create(product=product, **var)
+
+    def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-        #return super().create(request, *args, **kwargs)
+
+
+
+
+
 
 
 @method_decorator(csrf_exempt, name='dispatch')

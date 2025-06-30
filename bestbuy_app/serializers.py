@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import serializers
 from rest_framework.permissions import AllowAny
 
@@ -22,7 +23,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ['user_name', 'phone_number', 'email', 'password', 'market_name', 'id']
 
     def validate(self, data):
-        # Проверка, например, user_id уникален
+
         if User.objects.filter(id=data.get('id')).exists():
             raise serializers.ValidationError({"user id": "User ID must be unique."})
         return data
@@ -64,6 +65,9 @@ class CategorySerializer(serializers.ModelSerializer):
     #class Meta:
         #model = Variations
         #fields = ['option_name', 'option_value']
+
+
+
 
 class VariationsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -115,8 +119,6 @@ class ProductSerializer(serializers.ModelSerializer):
                 Variations.objects.create(product=instance, **var_data)
 
         return instance
-
-
 
 class UsersSerializer(serializers.ModelSerializer):
     class Meta:
