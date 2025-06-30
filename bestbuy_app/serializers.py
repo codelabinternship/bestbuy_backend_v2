@@ -60,10 +60,10 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = '__all__'
 
-class VariationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Variations
-        fields = ['option_name', 'option_value']
+#class VariationSerializer(serializers.ModelSerializer):
+    #class Meta:
+        #model = Variations
+        #fields = ['option_name', 'option_value']
 
 class VariationsSerializer(serializers.ModelSerializer):
     class Meta:
