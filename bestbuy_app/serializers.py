@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.permissions import AllowAny
 
 from .models import Variations, DeliveryDepartment, AdditionalMarket, User, Variations, PaymentMethods, Orders, ExportHistory, ChannelPosts, LoyaltyProgram, Branches, Market, Product, Category, BotConfiguration, Reviews, OrderItem, RoleChoices, TransactionTypeChoices, UserActivityLogs, SMSCampaign
-
+import json
 
 
 
@@ -70,17 +70,25 @@ class VariationsSerializer(serializers.ModelSerializer):
         model = Variations
         fields = '__all__'
 class ProductSerializer(serializers.ModelSerializer):
-    variations = VariationsSerializer(many=True)
+    variations = serializers.CharField(write_only=True)
     media = serializers.ImageField()
 
     class Meta:
         model = Product
-        fields = ['name', 'description', 'price', 'discount_price', 'stock_quantity',
-                  'category', 'brand', 'media', 'created_at', 'updated_at', 'variations']
+        fields = [
+            'name', 'description', 'price', 'discount_price', 'stock_quantity',
+            'category', 'brand', 'media', 'created_at', 'updated_at', 'variations'
+        ]
 
     def create(self, validated_data):
         from django.db import transaction
-        variations_data = validated_data.pop('variations')
+
+
+        variations_json = validated_data.pop('variations')
+        try:
+            variations_data = json.loads(variations_json)
+        except json.JSONDecodeError:
+            raise serializers.ValidationError({"variations": "Неверный JSON формат"})
 
         with transaction.atomic():
             product = Product.objects.create(**validated_data)
@@ -90,15 +98,21 @@ class ProductSerializer(serializers.ModelSerializer):
         return product
 
     def update(self, instance, validated_data):
-        variations_data = validated_data.pop('variations', [])
+        variations_json = validated_data.pop('variations', None)
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
-        instance.variations.all().delete()
-        for var_data in variations_data:
-            Variations.objects.create(product=instance, **var_data)
+        if variations_json:
+            try:
+                variations_data = json.loads(variations_json)
+            except json.JSONDecodeError:
+                raise serializers.ValidationError({"variations": "Неверный JSON формат"})
+
+            instance.variations.all().delete()
+            for var_data in variations_data:
+                Variations.objects.create(product=instance, **var_data)
 
         return instance
 
