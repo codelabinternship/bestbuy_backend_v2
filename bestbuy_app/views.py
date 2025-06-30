@@ -155,6 +155,11 @@ class ProductViewSet(viewsets.ModelViewSet):
         tags=["Products_api"]
     )
     def create(self, request, *args, **kwargs):
+        if isinstance(request.data.get('variations'), str):
+            try:
+                request.data['variations'] = json.loads(request.data['variations'])
+            except json.JSONDecodeError:
+                return Response({'error': 'Invalid JSON format in variations'}, status=400)
         return super().create(request, *args, **kwargs)
 
 
@@ -223,6 +228,7 @@ class VariationsViewSet(viewsets.ModelViewSet):
     queryset = Variations.objects.all()
     serializer_class = VariationsSerializer
     parser_class = [MultiPartParser, FormParser]
+    swagger_schema = variations_api
 
 
 #class UserViewSet(viewsets.ModelViewSet):
@@ -233,6 +239,7 @@ class VariationsViewSet(viewsets.ModelViewSet):
 class OrdersViewSet(viewsets.ModelViewSet):
     queryset = Orders.objects.all()
     serializer_class = OrdersSerializer
+    swagger_schema = OrderSchema
 
 
 class ExportHistoryViewSet(viewsets.ModelViewSet):
