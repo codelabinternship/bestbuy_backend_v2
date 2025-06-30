@@ -65,9 +65,13 @@ class VariationSerializer(serializers.ModelSerializer):
         model = Variations
         fields = ['option_name', 'option_value']
 
-
+class VariationsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Variations
+        fields = '__all__'
 class ProductSerializer(serializers.ModelSerializer):
-    variations = VariationSerializer(many=True)
+    variations = VariationsSerializer(many=True)
+    media = serializers.ImageField()
 
     class Meta:
         model = Product
@@ -84,6 +88,19 @@ class ProductSerializer(serializers.ModelSerializer):
                 Variations.objects.create(product=product, **var_data)
 
         return product
+
+    def update(self, instance, validated_data):
+        variations_data = validated_data.pop('variations', [])
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        instance.variations.all().delete()
+        for var_data in variations_data:
+            Variations.objects.create(product=instance, **var_data)
+
+        return instance
 
 
 
@@ -165,10 +182,7 @@ class PaymentMethodsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class VariationsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Variations
-        fields = '__all__'
+
 
 
 
