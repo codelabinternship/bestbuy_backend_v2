@@ -151,31 +151,30 @@ class ProductViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         operation_description="Создать продукт с вариациями",
         responses={201: ProductSerializer()},
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                'name': openapi.Schema(type=openapi.TYPE_STRING),
-                'description': openapi.Schema(type=openapi.TYPE_STRING),
-                'price': openapi.Schema(type=openapi.TYPE_NUMBER),
-                'discount_price': openapi.Schema(type=openapi.TYPE_NUMBER),
-                'stock_quantity': openapi.Schema(type=openapi.TYPE_INTEGER),
-                'category': openapi.Schema(type=openapi.TYPE_INTEGER),
-                'brand': openapi.Schema(type=openapi.TYPE_INTEGER),
-                'media': openapi.Schema(type=openapi.TYPE_FILE),
-                'variations': openapi.Schema(
-                    type=openapi.TYPE_ARRAY,
-                    items=openapi.Schema(
-                        type=openapi.TYPE_OBJECT,
-                        properties={
-                            'color': openapi.Schema(type=openapi.TYPE_STRING),
-                            'size': openapi.Schema(type=openapi.TYPE_STRING),
-                            'quantity': openapi.Schema(type=openapi.TYPE_INTEGER),
-                        }
-                    )
-                ),
-            }
-        ),
-        tags=["Products_api"]
+        #request_body=openapi.Schema(
+         #   type=openapi.TYPE_OBJECT,
+          #  properties={
+           #     'name': openapi.Schema(type=openapi.TYPE_STRING),
+            #    'description': openapi.Schema(type=openapi.TYPE_STRING),
+             #   'price': openapi.Schema(type=openapi.TYPE_NUMBER),
+              #  'discount_price': openapi.Schema(type=openapi.TYPE_NUMBER),
+               # 'stock_quantity': openapi.Schema(type=openapi.TYPE_INTEGER),
+                #'category': openapi.Schema(type=openapi.TYPE_INTEGER),
+                #'brand': openapi.Schema(type=openapi.TYPE_INTEGER),
+                #'media': openapi.Schema(type=openapi.TYPE_FILE),
+                #'variations': openapi.Schema(
+                 #   type=openapi.TYPE_ARRAY,
+                  #  items=openapi.Schema(
+                   #     type=openapi.TYPE_OBJECT,
+                    #    properties={
+                     #       'color': openapi.Schema(type=openapi.TYPE_STRING),
+                      #      'size': openapi.Schema(type=openapi.TYPE_STRING),
+                       ##}
+                    #)
+                #),
+            #}
+        #),
+        #tags=["Products_api"]
     )
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
