@@ -141,12 +141,12 @@ def register(request):
     return render(request, 'registration/register.html', {'form': form})
 
 
-#@method_decorator(csrf_exempt, name='dispatch')
-#class ProductViewSet(viewsets.ModelViewSet):
-    #queryset = Product.objects.all()
-    #serializer_class = ProductSerializer
-    #swagger_schema = ProductSchema
-    #parser_classes = [MultiPartParser, FormParser]
+@method_decorator(csrf_exempt, name='dispatch')
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    swagger_schema = ProductSchema
+    parser_classes = [MultiPartParser, FormParser]
 
     #@swagger_auto_schema(
         #operation_description="Создать продукт с вариациями",
@@ -176,8 +176,8 @@ def register(request):
         #),
         #tags=["Products_api"]
     #)
-   # def create(self, request, *args, **kwargs):
-        #return super().create(request, *args, **kwargs)
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
