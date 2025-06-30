@@ -160,7 +160,11 @@ class ProductViewSet(viewsets.ModelViewSet):
                 request.data['variations'] = json.loads(request.data['variations'])
             except json.JSONDecodeError:
                 return Response({'error': 'Invalid JSON format in variations'}, status=400)
-        return super().create(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        #return super().create(request, *args, **kwargs)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
