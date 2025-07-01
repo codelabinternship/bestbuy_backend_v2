@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
@@ -340,6 +342,7 @@ class Product(models.Model):
     media = models.ImageField(upload_to=product_media_upload_path, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    product_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     image = models.ImageField(upload_to='product_images/', null=True, blank=True)
 
@@ -355,8 +358,7 @@ class Variations(models.Model):
     option_value = models.CharField(max_length=255)
 
     def __str__(self):
-        return f"{self.option_name}: {self.option_value} (Product {self.product_id})"
-
+        return f"{self.option_name}: {self.option_value} (Product: {self.product.product_id if self.product else 'No Product'})"
 
 
 
