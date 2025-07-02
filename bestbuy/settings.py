@@ -138,6 +138,22 @@ else:
         }
     }
 
+
+CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
+
+
+#
+# DATABASES = {
+#     'default':{
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'bestt',
+#         'USER': 'postgres',
+#         'PASSWORD': '8888',
+#         'HOST': 'localhost',
+#         'PORT': '5432'
+#     }
+# }
+
 AUTH_USER_MODEL = 'bestbuy_app.User'
 
 # Password validation
