@@ -41,6 +41,7 @@ class Market_api(TaggedSchema):
 class OrderSchema(TaggedSchema):
     TAG = "Orders_api"
 
+
 class DashboardSchema(TaggedSchema):
     TAG = "Dashboard_api"
 
@@ -80,6 +81,7 @@ class user_logs(TaggedSchema):
 
 class variations_api(TaggedSchema):
     TAG = "Variations"
+
 
 
 
@@ -252,6 +254,14 @@ class OrdersViewSet(viewsets.ModelViewSet):
     queryset = Orders.objects.all()
     serializer_class = OrdersSerializer
     swagger_schema = OrderSchema
+
+class PaymentStatusViewSet(viewsets.ModelViewSet):
+    queryset = PaymentStatus.objects.all()
+    serializer_class = PaymentStatusSerializer
+
+class OrderStatusViewSet(viewsets.ModelViewSet):
+    queryset = OrderStatus.objects.all()
+    serializer_class = OrderStatus
 
 
 class ExportHistoryViewSet(viewsets.ModelViewSet):

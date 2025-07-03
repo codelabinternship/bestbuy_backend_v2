@@ -275,17 +275,39 @@ class AdditionalMarket(models.Model):
         return f"{self.name} ({self.user.user_name})"
 
 
+class OrderStatus(models.TextChoices):
+    PENDING = 'pending', 'Ожидает'
+    PROCESSING = 'processing', 'В обработке'
+    COMPLETED = 'completed', 'Завершён'
+    CANCELED = 'canceled', 'Отменён'
+
+class PaymentStatus(models.TextChoices):
+    UNPAID = 'unpaid', 'Не оплачен'
+    PAID = 'paid', 'Оплачен'
+    REFUNDED = 'refunded', 'Возвращен'
+
 
 
 
 class Orders(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
-    order_status = models.CharField(max_length=50)
-    payment_status = models.CharField(max_length=50)
+    # order_status = models.CharField(max_length=50)
+    order_status = models.CharField(
+        max_length=20,
+        choices=OrderStatus.choices,
+        default=OrderStatus.PENDING
+    )
+    # payment_status = models.CharField(max_length=50)
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PaymentStatus.choices,
+        default=PaymentStatus.UNPAID)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    shipping_address = models.TextField()
     delivery_method_id = models.IntegerField()
+    payment_method = models.CharField(max_length=100)
     payment_method_id = models.IntegerField()
     branch_id = models.IntegerField()
 

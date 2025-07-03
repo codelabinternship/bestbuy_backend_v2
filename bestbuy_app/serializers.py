@@ -2,7 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.permissions import AllowAny
 
-from .models import Variations, DeliveryDepartment, AdditionalMarket, User, Variations, PaymentMethods, Orders, ExportHistory, ChannelPosts, LoyaltyProgram, Branches, Market, Product, Category, BotConfiguration, Reviews, OrderItem, RoleChoices, TransactionTypeChoices, UserActivityLogs, SMSCampaign
+from .models import Variations, DeliveryDepartment, AdditionalMarket, User, Variations, PaymentMethods, Orders, ExportHistory, ChannelPosts, LoyaltyProgram, Branches, Market, Product, Category, BotConfiguration, Reviews, OrderItem, RoleChoices, TransactionTypeChoices, UserActivityLogs, SMSCampaign, OrderStatus, PaymentStatus
 import json
 
 
@@ -207,4 +207,15 @@ class PaymentMethodsSerializer(serializers.ModelSerializer):
 class DeliveryDepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = DeliveryDepartment
+        fields = '__all__'
+
+
+class OrderStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderStatus
+        fields = '__all__'
+
+class PaymentStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentStatus
         fields = '__all__'
