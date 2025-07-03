@@ -107,9 +107,8 @@ SWAGGER_SETTINGS = {
     'USE_SESSION_AUTH': False,
     'LOGIN_URL': None,
     'LOGOUT_URL': None,
+    'SECURE_SCHEMA': 'https',
 }
-
-
 
 
 
