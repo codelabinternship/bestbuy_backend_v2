@@ -107,9 +107,8 @@ SWAGGER_SETTINGS = {
     'USE_SESSION_AUTH': False,
     'LOGIN_URL': None,
     'LOGOUT_URL': None,
+    'SECURE_SCHEMA': 'https',
 }
-
-
 
 
 
@@ -137,6 +136,22 @@ else:
             'PORT': '5432',
         }
     }
+
+
+CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
+
+
+#
+# DATABASES = {
+#     'default':{
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'bestt',
+#         'USER': 'postgres',
+#         'PASSWORD': '8888',
+#         'HOST': 'localhost',
+#         'PORT': '5432'
+#     }
+# }
 
 AUTH_USER_MODEL = 'bestbuy_app.User'
 

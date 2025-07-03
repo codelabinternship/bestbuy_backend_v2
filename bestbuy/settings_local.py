@@ -1,4 +1,4 @@
-#Файл settings_local.py для локального тестирования
+#пїЅпїЅпїЅпїЅ settings_local.py пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 """
 Django settings for bestbuy project.
 
@@ -63,12 +63,14 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:3001",
     "http://localhost:5173",
-    "http://192.168.28.43:5173"
+    "http://192.168.28.43:5173",
+    "http://192.168.80.86:5173"
 ]
 CSRF_TRUSTED_ORIGINS=[
     "http://localhost:3000",
     "http://localhost:3001",
-    "http://192.168.28.43:5173"
+    "http://192.168.28.43:5173",
+    "http://192.168.80.83:5173"
 
 ]
 
@@ -104,6 +106,22 @@ WSGI_APPLICATION = 'bestbuy.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default':{
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'bestt',
+#         'USER': 'postgres',
+#         'PASSWORD': '8888',
+#         'HOST': 'localhost',
+#         'PORT': '5432'
+#     }
+# }
+
+SWAGGER_SETTINGS = {
+    'SECURE_SCHEMA': 'https',
+}
+
+
 DATABASES = {
     'default':{
         'ENGINE': 'django.db.backends.postgresql',
@@ -114,7 +132,6 @@ DATABASES = {
         'PORT': '5432'
     }
 }
-
 
 
 # Password validation
