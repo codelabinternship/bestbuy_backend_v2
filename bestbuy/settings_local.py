@@ -117,6 +117,11 @@ WSGI_APPLICATION = 'bestbuy.wsgi.application'
 #     }
 # }
 
+SWAGGER_SETTINGS = {
+    'SECURE_SCHEMA': 'https',
+}
+
+
 DATABASES = {
     'default':{
         'ENGINE': 'django.db.backends.postgresql',
