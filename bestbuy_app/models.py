@@ -287,32 +287,86 @@ class PaymentStatus(models.TextChoices):
     REFUNDED = 'refunded', 'Возвращен'
 
 
-
-
 class Orders(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
-    # order_status = models.CharField(max_length=50)
+
     order_status = models.CharField(
         max_length=20,
         choices=OrderStatus.choices,
         default=OrderStatus.PENDING
     )
-    # payment_status = models.CharField(max_length=50)
+
     payment_status = models.CharField(
         max_length=20,
         choices=PaymentStatus.choices,
-        default=PaymentStatus.UNPAID)
+        default=PaymentStatus.UNPAID
+    )
+
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
     shipping_address = models.TextField(null=True, blank=True)
-    delivery_method_id = models.IntegerField()
-    payment_method = models.CharField(max_length=100, default='card')
-    payment_method_id = models.IntegerField()
-    branch_id = models.IntegerField()
+
+    delivery_method = models.ForeignKey(
+        'DeliveryMethods',
+        on_delete=models.SET_NULL,
+        null=True,
+        to_field='delivery_method_id',
+        db_column='delivery_method_id',
+        related_name='orders'
+    )
+
+    payment_method = models.ForeignKey(
+        'PaymentMethods',
+        on_delete=models.SET_NULL,
+        null=True,
+        to_field='payment_method_id',
+        db_column='payment_method_id',
+        related_name='orders'
+    )
+
+    branch = models.ForeignKey(
+        'Branches',
+        on_delete=models.SET_NULL,
+        null=True,
+        to_field='branch_id',
+        db_column='branch_id',
+        related_name='orders'
+    )
 
     def __str__(self):
-        return f"Order #{self.id} by {self.user.user_name}"
+        return f"Order #{self.id}"
+
+
+# class Orders(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+#     # order_status = models.CharField(max_length=50)
+#     order_status = models.CharField(
+#         max_length=20,
+#         choices=OrderStatus.choices,
+#         default=OrderStatus.PENDING
+#     )
+#     # payment_status = models.CharField(max_length=50)
+#     payment_status = models.CharField(
+#         max_length=20,
+#         choices=PaymentStatus.choices,
+#         default=PaymentStatus.UNPAID)
+#     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+#     shipping_address = models.TextField(null=True, blank=True)
+#     delivery_method_id = models.IntegerField()
+#     payment_method = models.CharField(max_length=100, default='card')
+#     payment_method_id = models.IntegerField()
+#     branch_id = models.IntegerField()
+#
+#     def __str__(self):
+#         return f"Order #{self.id} by {self.user.username if self.user else 'Unknown'}"
+
+    # def __str__(self):
+    #     return f"Order #{self.id} by {self.user.user_name}"
 
 
 class OrderItem(models.Model):
