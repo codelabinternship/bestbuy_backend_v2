@@ -255,13 +255,7 @@ class OrdersViewSet(viewsets.ModelViewSet):
     serializer_class = OrdersSerializer
     swagger_schema = OrderSchema
 
-class PaymentStatusViewSet(viewsets.ModelViewSet):
-    queryset = PaymentStatus.objects.all()
-    serializer_class = PaymentStatusSerializer
 
-class OrderStatusViewSet(viewsets.ModelViewSet):
-    queryset = OrderStatus.objects.all()
-    serializer_class = OrderStatus
 
 
 class ExportHistoryViewSet(viewsets.ModelViewSet):

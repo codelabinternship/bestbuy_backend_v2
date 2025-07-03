@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import TelegramAuthView, MarketViewSet, DeliveryDepartmentViewSet, LoyaltyProgramViewSet, \
     ChannelPostsViewSet, ExportHistoryViewSet, OrdersViewSet, VariationsViewSet, PaymentMethodsViewSet, BranchesViewSet, \
     ProductViewSet, CategoryViewSet, UserViewSet, BotConfigurationViewSet, ReviewViewSet, OrderItemViewSet, \
-    RoleChoicesView, UserActivityLogsViewSet, SMSCampaignViewSet, PaymentStatusViewSet
+    RoleChoicesView, UserActivityLogsViewSet, SMSCampaignViewSet
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -25,8 +25,6 @@ router.register(r'channel-posts', ChannelPostsViewSet)
 router.register(r'loyalty', LoyaltyProgramViewSet)
 router.register(r'markets', MarketViewSet, basename='market')
 router.register(r'delivery-departments', DeliveryDepartmentViewSet)
-router.register(r'payment-status', PaymentStatusViewSet)
-router.register(r'orders', OrdersViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

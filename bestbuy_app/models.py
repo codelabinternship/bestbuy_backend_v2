@@ -305,9 +305,9 @@ class Orders(models.Model):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    shipping_address = models.TextField()
+    shipping_address = models.TextField(null=True, blank=True)
     delivery_method_id = models.IntegerField()
-    payment_method = models.CharField(max_length=100)
+    payment_method = models.CharField(max_length=100, default='card')
     payment_method_id = models.IntegerField()
     branch_id = models.IntegerField()
 
