@@ -4,8 +4,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
-
-
+from .storage import CustomS3Storage
 
 
 class RoleChoices(models.TextChoices):
@@ -220,7 +219,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         choices=RoleChoices.choices,
         default=RoleChoices.CUSTOMER
     )
-    address = models.CharField(max_length=300)
     status = models.BooleanField(default=True)
 
     is_active = models.BooleanField(default=True)
@@ -260,7 +258,7 @@ class Market(models.Model):
     working_hours_from = models.TimeField(null=True, blank=True)
     working_hours_to = models.TimeField(null=True, blank=True)
     is_daily = models.BooleanField(default=True)
-    logo = models.ImageField(upload_to='market_logos/', blank=True, null=True)
+    logo = models.ImageField(storage=CustomS3Storage(),upload_to='market_logos/', blank=True, null=True)
     user = models.OneToOneField('User', related_name='market', on_delete=models.CASCADE)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='markets_owned', null=True)
 
@@ -400,7 +398,7 @@ def product_media_upload_path(instance, filename):
 class Category(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to=category_image_upload_path, blank=True, null=True)
+    image = models.ImageField(storage=CustomS3Storage(), upload_to=category_image_upload_path, blank=True, null=True)
     status = models.BooleanField(default=True)
 
     def __str__(self):
@@ -415,12 +413,12 @@ class Product(models.Model):
     stock_quantity = models.IntegerField(default=0)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products', blank=True, null=True)
     brand = models.CharField(max_length=255, blank=True, null=True)
-    media = models.ImageField(upload_to=product_media_upload_path, blank=True, null=True)
+    media = models.ImageField(storage=CustomS3Storage(), upload_to=product_media_upload_path, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     product_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
-    image = models.ImageField(upload_to='product_images/', null=True, blank=True)
+    image = models.ImageField(storage=CustomS3Storage(), upload_to='product_images/', null=True, blank=True)
 
     def __str__(self):
         return self.name

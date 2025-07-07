@@ -19,6 +19,36 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,.onrender.com').split(',')
 
+
+
+
+# AWS S3 Configuration
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME')
+AWS_S3_CUSTOM_DOMAIN = os.environ.get('AWS_S3_CUSTOM_DOMAIN')
+
+# Print AWS configuration for debugging (remove in production)
+if DEBUG:
+    print("AWS Configuration:")
+    print(f"Access Key ID: {'*' * 16 if AWS_ACCESS_KEY_ID else 'Not set'}")
+    print(f"Secret Access Key: {'*' * 16 if AWS_SECRET_ACCESS_KEY else 'Not set'}")
+    print(f"Bucket Name: {AWS_STORAGE_BUCKET_NAME or 'Not set'}")
+    print(f"Region Name: {AWS_S3_REGION_NAME or 'Not set'}")
+    print(f"Custom Domain: {AWS_S3_CUSTOM_DOMAIN or 'Not set'}")
+
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_DEFAULT_ACL = 'public-read'
+AWS_LOCATION = 'media'
+
+
+
+
+
+
 # Apps
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -119,7 +149,7 @@ SWAGGER_SETTINGS = {
 
 WSGI_APPLICATION = 'bestbuy.wsgi.application'
 
-# Database
+# # Database
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL:
     DATABASES = {
@@ -141,7 +171,7 @@ else:
 CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 
 
-#
+
 # DATABASES = {
 #     'default':{
 #         'ENGINE': 'django.db.backends.postgresql',
@@ -199,8 +229,30 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 #MEDIA_ROOT = BASE_DIR/'media'
 
 
+#
+# # AWS SETTINGS
+# AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+# AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+# AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+# AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME')
+# AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
+#
+# # STATIC
+# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{os.environ.get('STATIC_LOCATION', 'static')}/"
+#
+# # MEDIA
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{os.environ.get('MEDIA_LOCATION', 'media')}/"
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+
+
+
+
 
 # JWT
 SIMPLE_JWT = {
@@ -218,3 +270,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# try:
+#     from .settings_local import *
+# except ImportError:
+#     pass
+
