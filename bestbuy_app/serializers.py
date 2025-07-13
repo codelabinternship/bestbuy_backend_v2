@@ -11,7 +11,7 @@ import json
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['telegram_id', 'id', 'user_name', 'email', 'created_at', 'role', 'address', 'status']
+        fields = ['telegram_id', 'id', 'user_name', 'email', 'created_at', 'role', 'status']
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -76,7 +76,7 @@ class VariationsSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     variations = serializers.CharField(write_only=True)
     media = serializers.ImageField()
-
+#dnnnnnxyjxmckccmcmcmmccmmfmfmfmfmfmf
     class Meta:
         model = Product
         fields = [
