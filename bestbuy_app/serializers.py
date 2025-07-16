@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny
 from .models import Variations, DeliveryDepartment, AdditionalMarket, User, Variations, PaymentMethods, Orders, ExportHistory, ChannelPosts, LoyaltyProgram, Branches, Market, Product, Category, BotConfiguration, Reviews, OrderItem, RoleChoices, TransactionTypeChoices, UserActivityLogs, SMSCampaign, OrderStatus, PaymentStatus
 import json
 
-
+from .models import *
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -73,9 +73,13 @@ class VariationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Variations
         fields = '__all__'
-class ProductSerializer(serializers.ModelSerializer):
-    variations = serializers.CharField(write_only=True)
-    media = serializers.ImageField()
+
+
+
+
+# class ProductSerializer(serializers.ModelSerializer):
+#     variations = serializers.CharField(write_only=True)
+#     media = serializers.ImageField()
 #dnnnnnxyjxmckccmcmcmmccmmfmfmfmfmfmf
     class Meta:
         model = Product
@@ -132,10 +136,41 @@ class BotConfigurationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+# class ReviewSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Reviews
+#         fields = '__all__'
+
+
+
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reviews
         fields = '__all__'
+
+    def validate_rating(self, value):
+        allowed_values = ['1', '2', '3', '4', '5']
+        str_value = str(value).lower()
+        if str_value not in allowed_values:
+            raise serializers.ValidationError("Рейтинг должен быть от 1 до 5.")
+        return str_value
+
+
+
+
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    reviews = ReviewSerializer(many=True, read_only=True)
+    average_rating = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Product
+        fields = '__all__'
+
+    def get_average_rating(self, obj):
+        return obj.average_rating()
+
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -165,12 +200,36 @@ class SMSCampaignSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
+class PromocodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Promocodes
+        fields = '__all__'
 ##
 class OrdersSerializer(serializers.ModelSerializer):
+    promocode = serializers.PrimaryKeyRelatedField(
+        queryset=Promocodes.objects.all(), required=False, allow_null=True
+    )
+
     class Meta:
         model = Orders
         fields = '__all__'
+
+    def validate(self, attrs):
+        promocode = attrs.get('promocode')
+        total_amount = attrs.get('total_amount')
+
+        if promocode:
+            if not promocode.is_valid():
+                raise serializers.ValidationError("Invalid or expired promocode.")
+            attrs['total_amount'] = promocode.apply_discount(total_amount)
+
+        return attrs
+
+
+# class OrdersSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Orders
+#         fields = '__all__'
 
 class ExportHistorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -199,7 +258,10 @@ class PaymentMethodsSerializer(serializers.ModelSerializer):
 
 
 
-
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = '__all__'
 
 
 

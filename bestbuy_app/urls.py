@@ -6,7 +6,7 @@ from .views import TelegramAuthView, MarketViewSet, DeliveryDepartmentViewSet, L
     RoleChoicesView, UserActivityLogsViewSet, SMSCampaignViewSet
 from django.conf import settings
 from django.conf.urls.static import static
-
+from .views import *
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'orders', OrdersViewSet)
@@ -25,10 +25,12 @@ router.register(r'channel-posts', ChannelPostsViewSet)
 router.register(r'loyalty', LoyaltyProgramViewSet)
 router.register(r'markets', MarketViewSet, basename='market')
 router.register(r'delivery-departments', DeliveryDepartmentViewSet)
+router.register(r'transactions', TransactionViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
     #path('api/auth/me/', GetMeView.as_view(), name='get_me'),
     path('auth/telegram-auth/', TelegramAuthView.as_view(), name='telegram-auth'),
+    path('transactions-report/', TransactionReportView.as_view(), name='transactions-report'),
 
 ]

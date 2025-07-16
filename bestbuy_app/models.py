@@ -11,16 +11,21 @@ class RoleChoices(models.TextChoices):
     ADMIN = 'Admin', 'Admin'
     CUSTOMER = 'Customer', 'Customer'
     EMPLOYEE = 'Employee', 'Employee'
+# from django.db import models
+# from django.contrib.auth import get_user_model
+#
+# User = get_user_model()
+
+
+
 
 class TransactionTypeChoices(models.TextChoices):
     ACCRUAL = 'accrual', 'Accrual'
     DEDUCTION = 'deduction', 'Deduction'
 
 class DiscountTypeChoices(models.TextChoices):
-    PERCENTAGE = 'percentage', 'Percentage'
-    FIXED = 'fixed', 'Fixed'
-
-
+    PERCENT = 'percent', 'Percent'
+    AMOUNT = 'amount', 'Amount'
 
 
 
@@ -107,6 +112,18 @@ class Promocodes(models.Model):
     valid_until = models.DateTimeField()
     status = models.BooleanField(default=True)
 
+    def is_valid(self):
+        now = timezone.now()
+        if not self.status:
+            return False
+        if self.valid_from and now < self.valid_from:
+            return False
+        if self.valid_until and now > self.valid_until:
+            return False
+        if self.usage_limit <= self.orders.count():
+            return False
+        return True
+
     def __str__(self):
         return f"{self.code} ({self.discount_type})"
 
@@ -127,7 +144,6 @@ class Branches(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.address}"
-
 
 
 
@@ -250,6 +266,53 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 
+class Transaction(models.Model):
+    transaction_id = models.AutoField(primary_key=True)
+    order = models.ForeignKey(
+        'Orders',
+        on_delete=models.CASCADE,
+        to_field='id',
+        db_column='order_id',
+        related_name='transactions'
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='transactions'
+    )
+    payment_method = models.ForeignKey(
+        'PaymentMethods',
+        on_delete=models.SET_NULL,
+        null=True,
+        to_field='payment_method_id',
+        db_column='payment_method_id',
+        related_name='transactions'
+    )
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        help_text='Сумма транзакции'
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text='Время создания транзакции'
+    )
+    external_id = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text='ID транзакции в платёжной системе (если есть)'
+    )
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Транзакция'
+        verbose_name_plural = 'Транзакции'
+
+    def __str__(self):
+        return f"Transaction #{self.transaction_id} — Order #{self.order.id} — {self.amount}"
+
 
 
 class Market(models.Model):
@@ -273,6 +336,8 @@ class AdditionalMarket(models.Model):
         return f"{self.name} ({self.user.user_name})"
 
 
+
+
 class OrderStatus(models.TextChoices):
     PENDING = 'pending', 'Ожидает'
     PROCESSING = 'processing', 'В обработке'
@@ -285,19 +350,23 @@ class PaymentStatus(models.TextChoices):
     REFUNDED = 'refunded', 'Возвращен'
 
 
+
+
+
+
 class Orders(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
 
     order_status = models.CharField(
         max_length=20,
-        choices=OrderStatus.choices,
-        default=OrderStatus.PENDING
+        choices=[('pending', 'Pending'), ('shipped', 'Shipped'), ('delivered', 'Delivered')],
+        default='pending'
     )
 
     payment_status = models.CharField(
         max_length=20,
-        choices=PaymentStatus.choices,
-        default=PaymentStatus.UNPAID
+        choices=[('unpaid', 'Unpaid'), ('paid', 'Paid')],
+        default='unpaid'
     )
 
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -334,8 +403,72 @@ class Orders(models.Model):
         related_name='orders'
     )
 
+    promocode = models.ForeignKey(
+        Promocodes,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='orders'
+    )
+
     def __str__(self):
         return f"Order #{self.id}"
+
+
+
+
+
+# class Orders(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+#
+#     order_status = models.CharField(
+#         max_length=20,
+#         choices=OrderStatus.choices,
+#         default=OrderStatus.PENDING
+#     )
+#
+#     payment_status = models.CharField(
+#         max_length=20,
+#         choices=PaymentStatus.choices,
+#         default=PaymentStatus.UNPAID
+#     )
+#
+#     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+#
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+#
+#     shipping_address = models.TextField(null=True, blank=True)
+#
+#     delivery_method = models.ForeignKey(
+#         'DeliveryMethods',
+#         on_delete=models.SET_NULL,
+#         null=True,
+#         to_field='delivery_method_id',
+#         db_column='delivery_method_id',
+#         related_name='orders'
+#     )
+#
+#     payment_method = models.ForeignKey(
+#         'PaymentMethods',
+#         on_delete=models.SET_NULL,
+#         null=True,
+#         to_field='payment_method_id',
+#         db_column='payment_method_id',
+#         related_name='orders'
+#     )
+#
+#     branch = models.ForeignKey(
+#         'Branches',
+#         on_delete=models.SET_NULL,
+#         null=True,
+#         to_field='branch_id',
+#         db_column='branch_id',
+#         related_name='orders'
+#     )
+#
+#     def __str__(self):
+#         return f"Order #{self.id}"
 
 
 # class Orders(models.Model):
@@ -405,6 +538,8 @@ class Category(models.Model):
         return self.name
 
 
+
+
 class Product(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
@@ -417,11 +552,41 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     product_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-
     image = models.ImageField(storage=CustomS3Storage(), upload_to='product_images/', null=True, blank=True)
 
     def __str__(self):
         return self.name
+
+    def average_rating(self):
+        reviews = self.reviews.all()
+        ratings = []
+        for review in reviews:
+            try:
+                ratings.append(int(review.rating))
+            except ValueError:
+                pass
+        return round(sum(ratings) / len(ratings), 2) if ratings else None
+
+
+
+# class Product(models.Model):
+#     name = models.CharField(max_length=255)
+#     description = models.TextField(blank=True, null=True)
+#     price = models.DecimalField(max_digits=10, decimal_places=2)
+#     discount_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+#     stock_quantity = models.IntegerField(default=0)
+#     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products', blank=True, null=True)
+#     brand = models.CharField(max_length=255, blank=True, null=True)
+#     media = models.ImageField(storage=CustomS3Storage(), upload_to=product_media_upload_path, blank=True, null=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+#     product_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+#
+#
+#     image = models.ImageField(storage=CustomS3Storage(), upload_to='product_images/', null=True, blank=True)
+#
+#     def __str__(self):
+#         return self.name
 
 
 #это вариации например цвет
@@ -437,18 +602,48 @@ class Variations(models.Model):
 
 
 
-
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Reviews(models.Model):
-    review_id = models.AutoField(primary_key=True)
-    product_id = models.IntegerField()
-    user_id = models.IntegerField()
-    rating = models.IntegerField()
-    comment = models.TextField()
+    RATING_CHOICES = [
+        ('1', '😡 Плохо'),
+        ('2', '🙁 Не очень'),
+        ('3', '😐 Нормально'),
+        ('4', '🙂 Хорошо'),
+        ('5', '😍 Отлично'),
+    ]
+
+    product = models.ForeignKey(
+        'Product',
+        to_field='product_id',
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='reviews', null=True, blank=True)
+    rating = models.CharField(max_length=20, choices=RATING_CHOICES)
+    comment = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = ('user', 'product')  # один отзыв от одного юзера на один продукт
+
     def __str__(self):
-        return f"Review {self.review_id} - Product {self.product_id} - User {self.user_id}"
+        return f"Review {self.id} - Product {self.product.name} - User {self.user.user_name}"
+
+
+
+# class Reviews(models.Model):
+#     review_id = models.AutoField(primary_key=True)
+#     product_id = models.IntegerField()
+#     user_id = models.IntegerField()
+#     rating = models.FloatField(
+#         validators=[MinValueValidator(1.0), MaxValueValidator(5.0)]
+#     )
+#     comment = models.TextField()
+#     created_at = models.DateTimeField(auto_now_add=True)
+#
+#     def __str__(self):
+#         return f"Review {self.review_id} - Product {self.product_id} - User {self.user_id}"
 
 
 

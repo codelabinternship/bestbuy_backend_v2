@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework import permissions
 from django.shortcuts import render
 from rest_framework import generics
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 # from rest_framework_simplejwt.tokens import RefreshToken
@@ -20,7 +21,10 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from drf_yasg.inspectors import SwaggerAutoSchema
 from rest_framework.parsers import JSONParser, FormParser, MultiPartParser
-
+from openpyxl import load_workbook
+from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser
+from rest_framework.response import Response
 
 
 class TaggedSchema(SwaggerAutoSchema):
@@ -41,6 +45,9 @@ class Market_api(TaggedSchema):
 class OrderSchema(TaggedSchema):
     TAG = "Orders_api"
 
+
+class TransactionSchema(TaggedSchema):
+    TAG = "Transactions_api"
 
 class DashboardSchema(TaggedSchema):
     TAG = "Dashboard_api"
@@ -153,6 +160,22 @@ class ProductViewSet(viewsets.ModelViewSet):
     parser_classes = [MultiPartParser, FormParser]
     swagger_schema = ProductSchema
 
+    @action(detail=True, methods=['post'], url_path='add_review')
+    def add_review(self, request, pk=None):
+        try:
+            product = self.get_object()
+            data = request.data.copy()
+            data['product'] = product.product_id
+
+            serializer = ReviewSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Product.DoesNotExist:
+            return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
     def perform_create(self, serializer):
         variations_data = self.request.data.get('variations')
         if isinstance(variations_data, str):
@@ -165,16 +188,15 @@ class ProductViewSet(viewsets.ModelViewSet):
         for var in variations_data:
             Variations.objects.create(product=product, **var)
 
+
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-
-
-
-
+    parser_classes = [MultiPartParser, FormParser]
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -238,6 +260,20 @@ class PaymentMethodsViewSet(viewsets.ModelViewSet):
     swagger_schema = payment_metods
 
 
+class TransactionViewSet(viewsets.ModelViewSet):
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
+    swagger_schema = TransactionSchema
+
+
+
+class TransactionReportView(APIView):
+    def get(self, request):
+        transactions = Transaction.objects.all().order_by('-created_at')
+        serializer = TransactionSerializer(transactions, many=True)
+        return Response(serializer.data)
+
+
 class VariationsViewSet(viewsets.ModelViewSet):
     queryset = Variations.objects.all()
     serializer_class = VariationsSerializer
@@ -254,6 +290,9 @@ class OrdersViewSet(viewsets.ModelViewSet):
     queryset = Orders.objects.all()
     serializer_class = OrdersSerializer
     swagger_schema = OrderSchema
+
+    def perform_create(self, serializer):
+        instance = serializer.save()
 
 
 

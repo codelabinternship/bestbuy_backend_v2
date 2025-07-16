@@ -37,7 +37,7 @@ from bestbuy_app.views import (
     VariationsViewSet, OrdersViewSet, MarketViewSet,
     AdditionalMarketViewSet, DeliveryDepartmentViewSet,
     RegisterView, LoginView, GetMeView, RoleChoicesView, DashboardView,
-    TelegramAuthView
+    TelegramAuthView,  TransactionViewSet, TransactionReportView
 )
 
 
@@ -78,6 +78,7 @@ router.register(r'orders', OrdersViewSet, basename='orders')
 router.register(r'markets', MarketViewSet, basename='markets')
 router.register(r'additional_markets', AdditionalMarketViewSet, basename='additional_markets'),
 router.register(r'delivery-departments', DeliveryDepartmentViewSet, basename='delivery-departments')
+router.register(r'transactions', TransactionViewSet, basename='transactions')
 #router.register(r'telegram_auth', TelegramAuthView)
 
 # from rest_framework_simplejwt.views import (
@@ -116,6 +117,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     #path('api/', include('router.urls')),
     path('bot/', include('telegram_bot.urls')),
+    path('transactions-report/', TransactionReportView.as_view(), name='transactions-report'),
 
     # Главная страница
     path('', index_page),

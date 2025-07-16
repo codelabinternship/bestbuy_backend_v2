@@ -86,6 +86,11 @@ REST_FRAMEWORK = {
 
 
 
+#vvvvvvvvvbhjio
+
+# STATIC_LOCATION=static
+# MEDIA_LOCATION=media
+
 ROOT_URLCONF = 'bestbuy.urls'
 
 TEMPLATES = [
@@ -119,7 +124,7 @@ AWS_S3_REGION_NAME = 'your-region'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'besttbuy',
+        'NAME': 'xaxa',
         'USER': 'postgres',
         'PASSWORD': '8888',
         'HOST': 'localhost',
