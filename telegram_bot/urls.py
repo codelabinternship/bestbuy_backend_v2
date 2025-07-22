@@ -1,9 +1,9 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import QuizViewSet
+from .views import BotViewSet
 
 router = DefaultRouter()
-router.register(r'quiz', QuizViewSet)
+router.register(r'', BotViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
