@@ -32,5 +32,6 @@ urlpatterns = [
     #path('api/auth/me/', GetMeView.as_view(), name='get_me'),
     path('auth/telegram-auth/', TelegramAuthView.as_view(), name='telegram-auth'),
     path('transactions-report/', TransactionReportView.as_view(), name='transactions-report'),
+    path('report/first-user-order/', FirstOrderUserReport.as_view()),
 
 ]

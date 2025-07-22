@@ -25,6 +25,13 @@ from openpyxl import load_workbook
 from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
+import json
+from openpyxl import load_workbook
+from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 
 class TaggedSchema(SwaggerAutoSchema):
@@ -115,7 +122,7 @@ class DashboardView(APIView):
             'message': 'Welcome to dashboard!',
             'user': user_serializer.data
         }, 200)
-
+hghost = '148FG_bt78'''
 
 def index_page(request):
     return render(request, 'index.html')
@@ -127,7 +134,7 @@ def index_page(request):
 from rest_framework import viewsets
 from .models import AdditionalMarket, Product, Category, User, BotConfiguration, Reviews, OrderItem, RoleChoices, \
     UserActivityLogs, SMSCampaign
-from .serializers import DeliveryDepartmentSerializer, RegisterSerializer, AdditionalMarketSerializer, VariationsSerializer, PaymentMethodsSerializer, \
+from .serializers import DeliveryDepartmentSerializer, RegisterSerializer, AdditionalMarketSerializer, VariationSerializer, PaymentMethodsSerializer, \
     OrdersSerializer, ExportHistorySerializer, ChannelPostsSerializer, LoyaltyProgramSerializer, BranchesSerializer, \
     ProductSerializer, CategorySerializer, UsersSerializer, BotConfigurationSerializer, ReviewSerializer, \
     OrderItemSerializer, RoleChoicesSerializer, UserActivityLogsSerializer, SMSCampaignSerializer
@@ -154,6 +161,7 @@ def register(request):
 
 from rest_framework.parsers import JSONParser
 
+
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -166,7 +174,6 @@ class ProductViewSet(viewsets.ModelViewSet):
             product = self.get_object()
             data = request.data.copy()
             data['product'] = product.product_id
-
             serializer = ReviewSerializer(data=data)
             if serializer.is_valid():
                 serializer.save()
@@ -175,6 +182,30 @@ class ProductViewSet(viewsets.ModelViewSet):
         except Product.DoesNotExist:
             return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
 
+    @action(detail=False, methods=['post'], url_path='import_excel')
+    def import_excel(self, request):
+        excel_file = request.FILES.get('file')
+        if not excel_file:
+            return Response({"error": "No file provided"}, status=400)
+
+        wb = load_workbook(excel_file)
+        ws = wb.active
+
+        for row in ws.iter_rows(min_row=2, values_only=True):
+            name, description, price, stock_quantity = row[:4]
+            Product.objects.create(
+                name=name,
+                description=description,
+                price=price,
+                stock_quantity=stock_quantity
+            )
+        return Response({"status": "Products imported successfully!"})
+
+    @action(detail=False, methods=['get'], url_path='all')
+    def all_products(self, request):
+        queryset = Product.objects.all()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def perform_create(self, serializer):
         variations_data = self.request.data.get('variations')
@@ -183,12 +214,12 @@ class ProductViewSet(viewsets.ModelViewSet):
                 variations_data = json.loads(variations_data)
             except json.JSONDecodeError:
                 raise serializers.ValidationError({'variations': 'Invalid JSON format'})
+        else:
+            variations_data = variations_data or []
 
         product = serializer.save()
         for var in variations_data:
             Variations.objects.create(product=product, **var)
-
-
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -196,7 +227,65 @@ class ProductViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    parser_classes = [MultiPartParser, FormParser]
+
+class FirstOrderUserReport(APIView):
+    def get(self, request):
+        first_order = Orders.objects.order_by('created_at').first()
+        if not first_order:
+            return Response({'detail': 'No orders yet'}, status=404)
+
+        user = first_order.user
+        return Response({
+            'user_id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'first_order_date': first_order.created_at,
+        })
+
+
+# class ProductViewSet(viewsets.ModelViewSet):
+#     queryset = Product.objects.all()
+#     serializer_class = ProductSerializer
+#     parser_classes = [MultiPartParser, FormParser]
+#     swagger_schema = ProductSchema
+#
+#     @action(detail=True, methods=['post'], url_path='add_review')
+#     def add_review(self, request, pk=None):
+#         try:
+#             product = self.get_object()
+#             data = request.data.copy()
+#             data['product'] = product.product_id
+#
+#             serializer = ReviewSerializer(data=data)
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 return Response(serializer.data, status=status.HTTP_201_CREATED)
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         except Product.DoesNotExist:
+#             return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+#
+#
+#     def perform_create(self, serializer):
+#         variations_data = self.request.data.get('variations')
+#         if isinstance(variations_data, str):
+#             try:
+#                 variations_data = json.loads(variations_data)
+#             except json.JSONDecodeError:
+#                 raise serializers.ValidationError({'variations': 'Invalid JSON format'})
+#
+#         product = serializer.save()
+#         for var in variations_data:
+#             Variations.objects.create(product=product, **var)
+#
+#
+#
+#     def create(self, request, *args, **kwargs):
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         self.perform_create(serializer)
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
+#
+#     parser_classes = [MultiPartParser, FormParser]
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -276,7 +365,7 @@ class TransactionReportView(APIView):
 
 class VariationsViewSet(viewsets.ModelViewSet):
     queryset = Variations.objects.all()
-    serializer_class = VariationsSerializer
+    serializer_class = VariationSerializer
     parser_class = [MultiPartParser, FormParser]
     swagger_schema = variations_api
 

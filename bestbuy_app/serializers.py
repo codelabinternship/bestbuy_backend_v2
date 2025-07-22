@@ -69,7 +69,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 
-class VariationsSerializer(serializers.ModelSerializer):
+class VariationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Variations
         fields = '__all__'
@@ -163,6 +163,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     reviews = ReviewSerializer(many=True, read_only=True)
     average_rating = serializers.SerializerMethodField()
+    variations = VariationSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
