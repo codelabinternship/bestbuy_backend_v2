@@ -1,16 +1,17 @@
+from django.db import transaction
 from rest_framework import serializers
 from rest_framework.permissions import AllowAny
 
-from .models import Variations, DeliveryDepartment, AdditionalMarket, User, Variations, PaymentMethods, Orders, ExportHistory, ChannelPosts, LoyaltyProgram, Branches, Market, Product, Category, Reviews, OrderItem, RoleChoices, TransactionTypeChoices, UserActivityLogs, SMSCampaign
+from .models import Variations, DeliveryDepartment, AdditionalMarket, User, Variations, PaymentMethods, Orders, ExportHistory, ChannelPosts, LoyaltyProgram, Branches, Market, Product, Category, BotConfiguration, Reviews, OrderItem, RoleChoices, TransactionTypeChoices, UserActivityLogs, SMSCampaign, OrderStatus, PaymentStatus
+import json
 
-
-
+from .models import *
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['telegram_id', 'id', 'user_name', 'email', 'created_at', 'role', 'address', 'status']
+        fields = ['telegram_id', 'id', 'user_name', 'email', 'created_at', 'role', 'status']
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -22,7 +23,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ['user_name', 'phone_number', 'email', 'password', 'market_name', 'id']
 
     def validate(self, data):
-        # Проверка, например, user_id уникален
+
         if User.objects.filter(id=data.get('id')).exists():
             raise serializers.ValidationError({"user id": "User ID must be unique."})
         return data
@@ -60,23 +61,42 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = '__all__'
 
+#class VariationSerializer(serializers.ModelSerializer):
+    #class Meta:
+        #model = Variations
+        #fields = ['option_name', 'option_value']
+
+
+
+
 class VariationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Variations
-        fields = ['option_name', 'option_value']
+        fields = '__all__'
 
 
-class ProductSerializer(serializers.ModelSerializer):
-    variations = VariationSerializer(many=True)
 
+
+# class ProductSerializer(serializers.ModelSerializer):
+#     variations = serializers.CharField(write_only=True)
+#     media = serializers.ImageField()
+#dnnnnnxyjxmckccmcmcmmccmmfmfmfmfmfmf
     class Meta:
         model = Product
-        fields = ['name', 'description', 'price', 'discount_price', 'stock_quantity',
-                  'category', 'brand', 'media', 'created_at', 'updated_at', 'variations']
+        fields = [
+            'name', 'description', 'price', 'discount_price', 'stock_quantity',
+            'category', 'brand', 'media', 'created_at', 'updated_at', 'variations', 'product_id'
+        ]
 
     def create(self, validated_data):
         from django.db import transaction
-        variations_data = validated_data.pop('variations')
+
+
+        variations_json = validated_data.pop('variations')
+        try:
+            variations_data = json.loads(variations_json)
+        except json.JSONDecodeError:
+            raise serializers.ValidationError({"variations": "Неверный JSON формат"})
 
         with transaction.atomic():
             product = Product.objects.create(**validated_data)
@@ -85,7 +105,24 @@ class ProductSerializer(serializers.ModelSerializer):
 
         return product
 
+    def update(self, instance, validated_data):
+        variations_json = validated_data.pop('variations', None)
 
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        if variations_json:
+            try:
+                variations_data = json.loads(variations_json)
+            except json.JSONDecodeError:
+                raise serializers.ValidationError({"variations": "Неверный JSON формат"})
+
+            instance.variations.all().delete()
+            for var_data in variations_data:
+                Variations.objects.create(product=instance, **var_data)
+
+        return instance
 
 class UsersSerializer(serializers.ModelSerializer):
     class Meta:
@@ -93,11 +130,48 @@ class UsersSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class BotConfigurationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BotConfiguration
+        fields = '__all__'
+
+
+# class ReviewSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Reviews
+#         fields = '__all__'
+
+
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reviews
         fields = '__all__'
+
+    def validate_rating(self, value):
+        allowed_values = ['1', '2', '3', '4', '5']
+        str_value = str(value).lower()
+        if str_value not in allowed_values:
+            raise serializers.ValidationError("Рейтинг должен быть от 1 до 5.")
+        return str_value
+
+
+
+
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    reviews = ReviewSerializer(many=True, read_only=True)
+    average_rating = serializers.SerializerMethodField()
+    variations = VariationSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Product
+        fields = '__all__'
+
+    def get_average_rating(self, obj):
+        return obj.average_rating()
+
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -127,12 +201,36 @@ class SMSCampaignSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
-
+class PromocodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Promocodes
+        fields = '__all__'
+##
 class OrdersSerializer(serializers.ModelSerializer):
+    promocode = serializers.PrimaryKeyRelatedField(
+        queryset=Promocodes.objects.all(), required=False, allow_null=True
+    )
+
     class Meta:
         model = Orders
         fields = '__all__'
+
+    def validate(self, attrs):
+        promocode = attrs.get('promocode')
+        total_amount = attrs.get('total_amount')
+
+        if promocode:
+            if not promocode.is_valid():
+                raise serializers.ValidationError("Invalid or expired promocode.")
+            attrs['total_amount'] = promocode.apply_discount(total_amount)
+
+        return attrs
+
+
+# class OrdersSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Orders
+#         fields = '__all__'
 
 class ExportHistorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -160,11 +258,11 @@ class PaymentMethodsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class VariationsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Variations
-        fields = '__all__'
 
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = '__all__'
 
 
 
@@ -172,4 +270,15 @@ class VariationsSerializer(serializers.ModelSerializer):
 class DeliveryDepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = DeliveryDepartment
+        fields = '__all__'
+
+
+class OrderStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderStatus
+        fields = '__all__'
+
+class PaymentStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentStatus
         fields = '__all__'

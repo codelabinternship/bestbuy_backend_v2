@@ -24,12 +24,11 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework.routers import DefaultRouter
-from bestbuy_app.views import DeliveryDepartmentViewSet, AdditionalMarketViewSet, GetMeView, LoginView, MarketViewSet, OrdersViewSet, RegisterView, LoginView, index_page, DashboardView, CategoryViewSet, ProductViewSet, UserViewSet, ReviewViewSet, OrderItemViewSet, RoleChoicesView, UserActivityLogsViewSet, SMSCampaignViewSet, BranchesViewSet, PaymentMethodsViewSet, VariationsViewSet
+from bestbuy_app.views import DeliveryDepartmentViewSet, AdditionalMarketViewSet, GetMeView, LoginView, MarketViewSet, OrdersViewSet, RegisterView, LoginView, index_page, DashboardView, CategoryViewSet, ProductViewSet, UserViewSet, BotConfigurationViewSet, ReviewViewSet, OrderItemViewSet, RoleChoicesView, UserActivityLogsViewSet, SMSCampaignViewSet, BranchesViewSet, PaymentMethodsViewSet, VariationsViewSet, FirstOrderUserReport
 router = DefaultRouter()
-from telegram_bot.views import BotViewSet
 
 
-
+from django.views.static import serve
 # Импорт ViewSet
 from bestbuy_app.views import (
     CategoryViewSet, ProductViewSet, UserViewSet, BotConfigurationViewSet,
@@ -38,7 +37,7 @@ from bestbuy_app.views import (
     VariationsViewSet, OrdersViewSet, MarketViewSet,
     AdditionalMarketViewSet, DeliveryDepartmentViewSet,
     RegisterView, LoginView, GetMeView, RoleChoicesView, DashboardView,
-    TelegramAuthView
+    TelegramAuthView,  TransactionViewSet, TransactionReportView
 )
 
 
@@ -59,26 +58,29 @@ schema_view = get_schema_view(
     ),
     public=True,
     permission_classes=[permissions.AllowAny],
+    url='https://bestbuy-backend-v2.onrender.com',
 )
 
 
 router = DefaultRouter()
-router.register(r'categories', CategoryViewSet)
+router.register(r'categories', CategoryViewSet, basename='categories')
 router.register(r'products', ProductViewSet, basename='product')
-router.register(r'users', UserViewSet)
-router.register(r'reviews', ReviewViewSet)
-router.register(r'order-items', OrderItemViewSet)
-router.register(r'user-logs', UserActivityLogsViewSet)
-router.register(r'sms-campaigns', SMSCampaignViewSet)
-router.register(r'branches', BranchesViewSet)
-router.register(r'payment-methods', PaymentMethodsViewSet)
-router.register(r'variations', VariationsViewSet)
-router.register(r'orders', OrdersViewSet)
-router.register(r'markets', MarketViewSet)
-router.register(r'additional_markets', AdditionalMarketViewSet),
-router.register(r'delivery-departments', DeliveryDepartmentViewSet)
-router.register(r'bot', BotViewSet)
+router.register(r'users', UserViewSet, basename='users')
+router.register(r'bot-configs', BotConfigurationViewSet, basename='bot-configs')
+router.register(r'reviews', ReviewViewSet, basename='reviews')
+router.register(r'order-items', OrderItemViewSet, basename='order-items')
+router.register(r'user-logs', UserActivityLogsViewSet, basename='user-logs')
+router.register(r'sms-campaigns', SMSCampaignViewSet, basename='sms-campaigns')
+router.register(r'branches', BranchesViewSet, basename='branches')
+router.register(r'payment-methods', PaymentMethodsViewSet, basename='payment-methods')
+router.register(r'variations', VariationsViewSet, basename='variations')
+router.register(r'orders', OrdersViewSet, basename='orders')
+router.register(r'markets', MarketViewSet, basename='markets')
+router.register(r'additional_markets', AdditionalMarketViewSet, basename='additional_markets'),
+router.register(r'delivery-departments', DeliveryDepartmentViewSet, basename='delivery-departments')
+router.register(r'transactions', TransactionViewSet, basename='transactions')
 #router.register(r'telegram_auth', TelegramAuthView)
+
 # from rest_framework_simplejwt.views import (
 #     TokenObtainPairView,
 #     TokenRefreshView,
@@ -115,11 +117,20 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     #path('api/', include('router.urls')),
     path('bot/', include('telegram_bot.urls')),
+    path('transactions-report/', TransactionReportView.as_view(), name='transactions-report'),
+    path('report/first-user-order/', FirstOrderUserReport.as_view()),
 
     # Главная страница
     path('', index_page),
-    path('', include(router.urls)),
-]
+    #path('', include(router.urls)),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if not settings.DEBUG:
+    urlpatterns += [
+        re_path(r'^media/(?P<path>.*)$', serve, {
+            'document_root': settings.MEDIA_ROOT,
+        }),
+    ]
